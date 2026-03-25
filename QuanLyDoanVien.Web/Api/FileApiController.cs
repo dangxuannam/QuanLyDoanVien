@@ -91,6 +91,84 @@ namespace QuanLyDoanVien.Api
             }
         }
 
+        [HttpPost, Route("upload-multiple")]
+        [ApiAuthorize(Permission = "FILE_UPLOAD")]
+        public IHttpActionResult UploadMultiple()
+        {
+            var httpRequest = HttpContext.Current.Request;
+            if (httpRequest.Files.Count == 0)
+                return BadRequest("Không có file nào được tải lên.");
+
+            long maxSize = 52428800; // 50MB per file
+            var module = httpRequest.Form["module"];
+            var userId = (int)Request.Properties["CurrentUserId"];
+            var username = Request.Properties["CurrentUsername"]?.ToString();
+
+            var results = new System.Collections.Generic.List<object>();
+
+            using (var db = new AppDbContext())
+            {
+                var fileSvc = new FileService(db);
+                var excelSvc = new ExcelService();
+
+                for (int i = 0; i < httpRequest.Files.Count; i++)
+                {
+                    var file = httpRequest.Files[i];
+
+                    if (file.ContentLength == 0)
+                    {
+                        results.Add(new { success = false, fileName = file.FileName, error = "File rỗng." });
+                        continue;
+                    }
+                    if (file.ContentLength > maxSize)
+                    {
+                        results.Add(new { success = false, fileName = file.FileName, error = "File vượt quá 50MB." });
+                        continue;
+                    }
+
+                    try
+                    {
+                        var attachment = fileSvc.SaveFile(new HttpPostedFileWrapper(file), userId, module, null, null);
+
+                        ExcelParseResult parseResult = null;
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        if (ext == ".xlsx" || ext == ".xls")
+                        {
+                            try
+                            {
+                                var fullPath = fileSvc.GetFullPath(attachment.FilePath);
+                                parseResult = excelSvc.ParseExcel(fullPath);
+                                attachment.SheetCount = parseResult.SheetCount;
+                                attachment.SheetNames = JsonConvert.SerializeObject(
+                                    parseResult.Sheets.Select(s => s.SheetName).ToList());
+                                db.SaveChanges();
+                            }
+                            catch { /* ignore parse error, still save file */ }
+                        }
+
+                        new AuditService(db).Log(userId, username,
+                            "UPLOAD_FILE", module ?? "HE_THONG",
+                            $"Upload file: {attachment.OriginalName} (ID: {attachment.Id})");
+
+                        results.Add(new {
+                            success = true,
+                            file = new {
+                                attachment.Id, attachment.OriginalName, attachment.FilePath,
+                                attachment.FileSize, attachment.ContentType,
+                                attachment.SheetCount, attachment.UploadedAt
+                            },
+                            excelData = parseResult
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        results.Add(new { success = false, fileName = file.FileName, error = ex.Message });
+                    }
+                }
+            }
+
+            return Ok(new { success = true, results });
+        }
         [HttpGet, Route("")]
         [ApiAuthorize(Permission = "FILE_VIEW")]
         public IHttpActionResult GetAll(int page = 1, int pageSize = 20, string module = null, string search = "")

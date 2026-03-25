@@ -74,6 +74,18 @@ export class ApiService {
     });
   }
 
+  uploadMultipleFiles(files: File[], module?: string): Observable<any> {
+    const token = localStorage.getItem('qldt_token') || '';
+    const fd = new FormData();
+    files.forEach(f => fd.append('file', f));
+    if (module) fd.append('module', module);
+    return this.http.post(`${this.base}/files/upload-multiple`, fd, {
+      headers: new HttpHeaders({ 'Authorization': `Bearer ${token}` }),
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
+
   // ─── Module 1 – Đầu tư công ──────────────────────────────────────────────
   getProjects(p?: any): Observable<PagedResult<Project>> { return this.get('/projects', p); }
   getProject(id: number): Observable<any>               { return this.get(`/projects/${id}`); }
