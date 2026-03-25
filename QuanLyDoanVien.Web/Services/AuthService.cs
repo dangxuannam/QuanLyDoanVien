@@ -17,10 +17,10 @@ namespace QuanLyDoanVien.Services
         {
             var user = _db.Users.FirstOrDefault(u => u.Username == username && u.IsActive);
             if (user == null)
-                return new LoginResult { Success = false, Message = "TÃªn Ä‘Äƒng nháº­p khÃ´ng tá»“n táº¡i hoáº·c Ä‘Ã£ bá»‹ khÃ³a." };
+                return new LoginResult { Success = false, Message = "Tên đăng nhập không tồn tại hoặc đã bị khóa." };
 
             if (!PasswordHelper.VerifyPassword(password, user.PasswordHash, user.PasswordSalt))
-                return new LoginResult { Success = false, Message = "Máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c." };
+                return new LoginResult { Success = false, Message = "Mật khẩu không chính xác." };
 
             // Invalidate old tokens
             var oldTokens = _db.UserTokens.Where(t => t.UserId == user.Id && t.IsActive).ToList();
@@ -133,10 +133,10 @@ namespace QuanLyDoanVien.Services
             var admin = new User
             {
                 Username = "admin",
-                FullName = "Quáº£n trá»‹ viÃªn há»‡ thá»‘ng",
+                FullName = "Quản trị viên hệ thống",
                 Email = "admin@lamdong.gov.vn",
                 Phone = "0263000000",
-                DonVi = "Sá»Ÿ Káº¿ hoáº¡ch vÃ  Äáº§u tÆ° LÃ¢m Äá»“ng",
+                DonVi = "Sở Kế hoạch và Đầu tư Lâm Đồng",
                 PasswordSalt = salt,
                 PasswordHash = PasswordHelper.HashPassword(defaultPwd, salt),
                 IsActive = true,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -69,7 +69,7 @@ namespace QuanLyDoanVien.Api
         public IHttpActionResult Create([FromBody] Member req)
         {
             if (string.IsNullOrEmpty(req?.FullName))
-                return BadRequest("Há» tÃªn Ä‘oÃ n viÃªn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+                return BadRequest("Họ tên đoàn viên không được để trống.");
 
             using (var db = new AppDbContext())
             {
@@ -77,7 +77,7 @@ namespace QuanLyDoanVien.Api
                     req.MemberCode = "DV" + DateTime.Now.ToString("yyyyMMddHHmmss");
 
                 if (db.Members.Any(m => m.MemberCode == req.MemberCode))
-                    return BadRequest("MÃ£ Ä‘oÃ n viÃªn Ä‘Ã£ tá»“n táº¡i.");
+                    return BadRequest("Mã đoàn viên đã tồn tại.");
 
                 req.CreatedBy = (int)Request.Properties["CurrentUserId"];
                 req.CreatedAt = DateTime.Now;
@@ -87,9 +87,9 @@ namespace QuanLyDoanVien.Api
 
                 new AuditService(db).Log(req.CreatedBy,
                     Request.Properties["CurrentUsername"]?.ToString(),
-                    "CREATE_MEMBER", "DOAN_VIEN", $"ThÃªm Ä‘oÃ n viÃªn: {req.FullName}");
+                    "CREATE_MEMBER", "DOAN_VIEN", $"Thêm đoàn viên: {req.FullName}");
 
-                return Ok(new { success = true, id = req.Id, message = "ThÃªm Ä‘oÃ n viÃªn thÃ nh cÃ´ng." });
+                return Ok(new { success = true, id = req.Id, message = "Thêm đoàn viên thành công." });
             }
         }
 
@@ -113,7 +113,7 @@ namespace QuanLyDoanVien.Api
                 m.IsActive = req.IsActive;
                 m.IsUnionMember = req.IsUnionMember;
                 m.Notes = req.Notes ?? m.Notes;
-                // Bá»• sung cÃ¡c trÆ°á»ng má»›i
+                // Bổ sung các trường mới
                 m.Ethnicity = req.Ethnicity ?? m.Ethnicity;
                 m.Religion = req.Religion ?? m.Religion;
                 m.Profession = req.Profession ?? m.Profession;
@@ -123,7 +123,7 @@ namespace QuanLyDoanVien.Api
                 m.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
 
-                return Ok(new { success = true, message = "Cáº­p nháº­t thÃ nh cÃ´ng." });
+                return Ok(new { success = true, message = "Cập nhật thành công." });
             }
         }
 
@@ -138,7 +138,7 @@ namespace QuanLyDoanVien.Api
                 m.IsActive = false;
                 m.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
-                return Ok(new { success = true, message = "ÄÃ£ xÃ³a Ä‘oÃ n viÃªn." });
+                return Ok(new { success = true, message = "Đã xóa đoàn viên." });
             }
         }
 
@@ -146,7 +146,7 @@ namespace QuanLyDoanVien.Api
         [ApiAuthorize(Permission = "DV_DELETE")]
         public IHttpActionResult DeleteMultiple([FromBody] List<int> ids)
         {
-            if (ids == null || !ids.Any()) return BadRequest("Danh sÃ¡ch ID trá»‘ng.");
+            if (ids == null || !ids.Any()) return BadRequest("Danh sách ID trống.");
             try
             {
                 using (var db = new AppDbContext())
@@ -162,9 +162,9 @@ namespace QuanLyDoanVien.Api
                     var currentUserId = (int)Request.Properties["CurrentUserId"];
                     var currentUsername = Request.Properties["CurrentUsername"]?.ToString();
                     new AuditService(db).Log(currentUserId, currentUsername, 
-                        "DELETE_MEMBER", "DOAN_VIEN", $"XÃ³a {members.Count} Ä‘oÃ n viÃªn.");
+                        "DELETE_MEMBER", "DOAN_VIEN", $"Xóa {members.Count} đoàn viên.");
 
-                    return Ok(new { success = true, message = $"ÄÃ£ xÃ³a {members.Count} Ä‘oÃ n viÃªn." });
+                    return Ok(new { success = true, message = $"Đã xóa {members.Count} đoàn viên." });
                 }
             }
             catch (Exception ex)
@@ -193,9 +193,9 @@ namespace QuanLyDoanVien.Api
                     var currentUserId = (int)Request.Properties["CurrentUserId"];
                     var currentUsername = Request.Properties["CurrentUsername"]?.ToString();
                     new AuditService(db).Log(currentUserId, currentUsername, 
-                        "DELETE_ALL_MEMBERS", "DOAN_VIEN", "XÃ³a toÃ n bá»™ danh sÃ¡ch Ä‘oÃ n viÃªn.");
+                        "DELETE_ALL_MEMBERS", "DOAN_VIEN", "Xóa toàn bộ danh sách đoàn viên.");
 
-                    return Ok(new { success = true, message = $"ÄÃ£ xÃ³a toÃ n bá»™ {count} Ä‘oÃ n viÃªn." });
+                    return Ok(new { success = true, message = $"Đã xóa toàn bộ {count} đoàn viên." });
                 }
             }
             catch (Exception ex)
@@ -228,7 +228,7 @@ namespace QuanLyDoanVien.Api
         [ApiAuthorize(Permission = "DV_CREATE")]
         public IHttpActionResult CreateGroup([FromBody] MemberGroup req)
         {
-            if (string.IsNullOrEmpty(req?.GroupName)) return BadRequest("TÃªn nhÃ³m khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+            if (string.IsNullOrEmpty(req?.GroupName)) return BadRequest("Tên nhóm không được để trống.");
             using (var db = new AppDbContext())
             {
                 if (string.IsNullOrEmpty(req.GroupCode))
@@ -275,11 +275,11 @@ namespace QuanLyDoanVien.Api
 
                 using (var package = new OfficeOpenXml.ExcelPackage())
                 {
-                    var ws = package.Workbook.Worksheets.Add("Danh sÃ¡ch Ä‘oÃ n viÃªn");
+                    var ws = package.Workbook.Worksheets.Add("Danh sách đoàn viên");
                     string[] headers = { 
-                        "STT", "Há» vÃ  tÃªn", "NgÃ y sinh", "PhÃ¢n loáº¡i", "DÃ¢n tá»™c", "TÃ´n giÃ¡o",
-                        "Nghá» nghiá»‡p", "Há»c váº¥n", "ChuyÃªn mÃ´n", "LÃ½ luáº­n chÃ­nh trá»‹",
-                        "NgÃ y vÃ o Äáº£ng DB", "NgÃ y vÃ o Äáº£ng CT", "Chá»©c vá»¥", "SÄT", "Email"
+                        "STT", "Họ và tên", "Ngày sinh", "Phân loại", "Dân tộc", "Tôn giáo",
+                        "Nghề nghiệp", "Học vấn", "Chuyên môn", "Lý luận chính trị",
+                        "Ngày vào Đảng DB", "Ngày vào Đảng CT", "Chức vụ", "SĐT", "Email"
                     };
 
                     for (int i = 0; i < headers.Length; i++)
@@ -297,7 +297,7 @@ namespace QuanLyDoanVien.Api
                         ws.Cells[r, 1].Value = i + 1;
                         ws.Cells[r, 2].Value = m.FullName;
                         ws.Cells[r, 3].Value = m.DateOfBirth?.ToString("dd/MM/yyyy");
-                        ws.Cells[r, 4].Value = m.PartyDateOfficial.HasValue ? "Äáº£ng viÃªn" : (m.IsUnionMember ? "ÄoÃ n viÃªn" : "Thanh niÃªn");
+                        ws.Cells[r, 4].Value = m.PartyDateOfficial.HasValue ? "Đảng viên" : (m.IsUnionMember ? "Đoàn viên" : "Thanh niên");
                         ws.Cells[r, 5].Value = m.Ethnicity;
                         ws.Cells[r, 6].Value = m.Religion;
                         ws.Cells[r, 7].Value = m.Profession;
@@ -332,7 +332,7 @@ namespace QuanLyDoanVien.Api
         [ApiAuthorize(Permission = "DV_CREATE")]
         public IHttpActionResult Import([FromBody] ImportRequest req)
         {
-            if (req == null || req.FileId <= 0) return BadRequest("ThÃ´ng tin file khÃ´ng há»£p lá»‡.");
+            if (req == null || req.FileId <= 0) return BadRequest("Thông tin file không hợp lệ.");
 
             using (var db = new AppDbContext())
             {
@@ -341,7 +341,7 @@ namespace QuanLyDoanVien.Api
 
                 var fileSvc = new Services.FileService(db);
                 var fullPath = fileSvc.GetFullPath(attachment.FilePath);
-                if (!System.IO.File.Exists(fullPath)) return BadRequest("File khÃ´ng tá»“n táº¡i trÃªn server.");
+                if (!System.IO.File.Exists(fullPath)) return BadRequest("File không tồn tại trên server.");
 
                 var excelSvc = new Services.ExcelService();
                 var data = excelSvc.ReadSheetForImport(fullPath, req.SheetName ?? "Sheet1");
@@ -360,95 +360,95 @@ namespace QuanLyDoanVien.Api
 
                 foreach (var row in data)
                 {
-                    // â”€â”€ Há» vÃ  tÃªn 
-                    string fullName = GetValue(row, "Há» vÃ  tÃªn", "Há» tÃªn", "Full Name", "HOTEN", "FullName", "TÃªn Ä‘oÃ n viÃªn");
+                    // ── Họ và tên 
+                    string fullName = GetValue(row, "Họ và tên", "Họ tên", "Full Name", "HOTEN", "FullName", "Tên đoàn viên");
                     if (string.IsNullOrEmpty(fullName)) continue;
 
-                    // â”€â”€ NgÃ y sinh/ Nam/Ná»¯ 
-                    string dobNamStr = GetValue(row, "NgÃ y, thÃ¡ng, nÄƒm sinh - Nam");
-                    string dobNuStr = GetValue(row, "NgÃ y, thÃ¡ng, nÄƒm sinh - Ná»¯");
-                    string dobChungStr = GetValue(row, "NgÃ y, thÃ¡ng, nÄƒm sinh", "NgÃ y thÃ¡ng nÄƒm sinh", "NgÃ y sinh", "Birthday");
+                    // ── Ngày sinh/ Nam/Nữ 
+                    string dobNamStr = GetValue(row, "Ngày, tháng, năm sinh - Nam");
+                    string dobNuStr = GetValue(row, "Ngày, tháng, năm sinh - Nữ");
+                    string dobChungStr = GetValue(row, "Ngày, tháng, năm sinh", "Ngày tháng năm sinh", "Ngày sinh", "Birthday");
 
                     string dobStr = !string.IsNullOrEmpty(dobNamStr) ? dobNamStr : 
                                    (!string.IsNullOrEmpty(dobNuStr) ? dobNuStr : dobChungStr);
                     var dob = ParseDate(dobStr);
 
-                    // â”€â”€ Giá»›i tÃ­nh 
+                    // ── Giới tính 
                     string gender = "";
                     if (!string.IsNullOrEmpty(dobNamStr) && ParseDate(dobNamStr) != null) gender = "Nam";
-                    else if (!string.IsNullOrEmpty(dobNuStr) && ParseDate(dobNuStr) != null) gender = "Ná»¯";
+                    else if (!string.IsNullOrEmpty(dobNuStr) && ParseDate(dobNuStr) != null) gender = "Nữ";
 
-                    var phone = GetValue(row, "SÄT", "Phone", "Äiá»‡n thoáº¡i", "SDT", "Sá»‘ Ä‘iá»‡n thoáº¡i") ?? "";
+                    var phone = GetValue(row, "SĐT", "Phone", "Điện thoại", "SDT", "Số điện thoại") ?? "";
               
                     if (existing.Any(e => e.FullName == fullName && e.DateOfBirth == dob)) continue;
 
-                    // â”€â”€ DÃ¢n tá»™c
-                    string ethnicity = GetValue(row, "DÃ¢n tá»™c", "Ethnic");
+                    // ── Dân tộc
+                    string ethnicity = GetValue(row, "Dân tộc", "Ethnic");
                     if (string.IsNullOrEmpty(ethnicity) || IsCheckedMark(ethnicity))
-                        ethnicity = "Kinh"; // default khi khÃ´ng resolve Ä‘Æ°á»£c
+                        ethnicity = "Kinh"; // default khi không resolve được
 
-                    // â”€â”€ TÃ´n giÃ¡o 
-                    string religion = GetValue(row, "TÃ´n giÃ¡o");
+                    // ── Tôn giáo 
+                    string religion = GetValue(row, "Tôn giáo");
                     if (string.IsNullOrEmpty(religion) || IsCheckedMark(religion))
-                        religion = "KhÃ´ng";
+                        religion = "Không";
 
-                    // â”€â”€ Nghá» nghiá»‡p, Há»c váº¥n, ChuyÃªn mÃ´n, LLCT (checkbox â†’ sub-tÃªn) â”€â”€
-                    string profession = GetValue(row, "Nghá» nghiá»‡p");
+                    // ── Nghề nghiệp, Học vấn, Chuyên môn, LLCT (checkbox → sub-tên) ──
+                    string profession = GetValue(row, "Nghề nghiệp");
                     if (IsCheckedMark(profession)) profession = "";
 
-                    string education = GetValue(row, "Há»c váº¥n");
+                    string education = GetValue(row, "Học vấn");
                     if (IsCheckedMark(education)) education = "";
 
-                    string expertise = GetValue(row, "ChuyÃªn mÃ´n");
+                    string expertise = GetValue(row, "Chuyên môn");
                     if (IsCheckedMark(expertise)) expertise = "";
 
-                    string politicalTheory = GetValue(row, "LÃ½ luáº­n chÃ­nh trá»‹");
+                    string politicalTheory = GetValue(row, "Lý luận chính trị");
                     if (IsCheckedMark(politicalTheory)) politicalTheory = "";
 
-                    // â”€â”€ Äáº£ng viÃªn: ngÃ y káº¿t náº¡p 
+                    // ── Đảng viên: ngày kết nạp 
                     var partyProb = ParseDate(GetValue(row,
-                        "ÄoÃ n viÃªn lÃ  Ä‘áº£ng viÃªn - NgÃ y káº¿t náº¡p dá»± bá»‹",
-                        "NgÃ y káº¿t náº¡p dá»± bá»‹", "Dá»± bá»‹"));
+                        "Đoàn viên là đảng viên - Ngày kết nạp dự bị",
+                        "Ngày kết nạp dự bị", "Dự bị"));
                     var partyOff = ParseDate(GetValue(row,
-                        "ÄoÃ n viÃªn lÃ  Ä‘áº£ng viÃªn - NgÃ y káº¿t náº¡p chÃ­nh thá»©c",
-                        "NgÃ y káº¿t náº¡p chÃ­nh thá»©c", "ChÃ­nh thá»©c"));
+                        "Đoàn viên là đảng viên - Ngày kết nạp chính thức",
+                        "Ngày kết nạp chính thức", "Chính thức"));
 
-                    // â”€â”€ Cáº¥p á»§y  
+                    // ── Cấp ủy  
                     var notesList = new System.Collections.Generic.List<string>();
-                    if (IsCheckedMark(GetValue(row, "Tham gia cáº¥p á»§y cáº¥p trÃªn cÆ¡ sá»Ÿ")))
-                        notesList.Add("Tham gia cáº¥p á»§y cáº¥p trÃªn cÆ¡ sá»Ÿ");
-                    if (IsCheckedMark(GetValue(row, "Tham gia cáº¥p á»§y cÆ¡ sá»Ÿ")))
-                        notesList.Add("Tham gia cáº¥p á»§y cÆ¡ sá»Ÿ");
+                    if (IsCheckedMark(GetValue(row, "Tham gia cấp ủy cấp trên cơ sở")))
+                        notesList.Add("Tham gia cấp ủy cấp trên cơ sở");
+                    if (IsCheckedMark(GetValue(row, "Tham gia cấp ủy cơ sở")))
+                        notesList.Add("Tham gia cấp ủy cơ sở");
                     string notes = string.Join(", ", notesList);
 
-                    // â”€â”€ Chá»©c vá»¥ 
+                    // ── Chức vụ 
                     var posList = new System.Collections.Generic.List<string>();
-                    if (IsCheckedMark(GetValue(row, "Sá»‘ Ä‘oÃ n viÃªn Ä‘áº£m nhiá»‡m cÃ¡c chá»©c vá»¥ chá»§ chá»‘t - Ban cháº¥p hÃ nh"))) posList.Add("Ban cháº¥p hÃ nh");
-                    if (IsCheckedMark(GetValue(row, "Sá»‘ Ä‘oÃ n viÃªn Ä‘áº£m nhiá»‡m cÃ¡c chá»©c vá»¥ chá»§ chá»‘t - Ban thÆ°á»ng vá»¥"))) posList.Add("Ban thÆ°á»ng vá»¥");
-                    if (IsCheckedMark(GetValue(row, "Sá»‘ Ä‘oÃ n viÃªn Ä‘áº£m nhiá»‡m cÃ¡c chá»©c vá»¥ chá»§ chá»‘t - BÃ­ thÆ°"))) posList.Add("BÃ­ thÆ°");
-                    if (IsCheckedMark(GetValue(row, "Sá»‘ Ä‘oÃ n viÃªn Ä‘áº£m nhiá»‡m cÃ¡c chá»©c vá»¥ chá»§ chá»‘t - PhÃ³ BÃ­ thÆ°"))) posList.Add("PhÃ³ BÃ­ thÆ°");
-                    if (IsCheckedMark(GetValue(row, "Sá»‘ Ä‘oÃ n viÃªn Ä‘áº£m nhiá»‡m cÃ¡c chá»©c vá»¥ chá»§ chá»‘t - ChuyÃªn mÃ´n"))) posList.Add("Cáº¥p trÆ°á»Ÿng (ChuyÃªn mÃ´n)");
-                    if (IsCheckedMark(GetValue(row, "Sá»‘ Ä‘oÃ n viÃªn Ä‘áº£m nhiá»‡m cÃ¡c chá»©c vá»¥ chá»§ chá»‘t"))) posList.Add("Cáº¥p phÃ³ (ChuyÃªn mÃ´n)");
+                    if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Ban chấp hành"))) posList.Add("Ban chấp hành");
+                    if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Ban thường vụ"))) posList.Add("Ban thường vụ");
+                    if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Bí thư"))) posList.Add("Bí thư");
+                    if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Phó Bí thư"))) posList.Add("Phó Bí thư");
+                    if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Chuyên môn"))) posList.Add("Cấp trưởng (Chuyên môn)");
+                    if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt"))) posList.Add("Cấp phó (Chuyên môn)");
                     
                     string position = string.Join(", ", posList);
                     if (string.IsNullOrEmpty(position))
-                        position = GetValue(row, "Chá»©c vá»¥", "Position");
+                        position = GetValue(row, "Chức vụ", "Position");
 
-                    // â”€â”€ PhÃ¢n loáº¡i 
+                    // ── Phân loại 
                     bool isUnionMember = true; 
-                    string phanLoai = GetValue(row, "PhÃ¢n loáº¡i", "Loáº¡i");
+                    string phanLoai = GetValue(row, "Phân loại", "Loại");
                     if (!string.IsNullOrEmpty(phanLoai))
-                        isUnionMember = phanLoai.ToLower().Contains("Ä‘oÃ n") || phanLoai.ToLower().Contains("Ä‘áº£ng");
+                        isUnionMember = phanLoai.ToLower().Contains("đoàn") || phanLoai.ToLower().Contains("đảng");
 
                     var m = new Member
                     {
                         FullName = fullName,
-                        MemberCode = GetValue(row, "MÃ£", "Code", "MÃ£ Ä‘oÃ n viÃªn") ?? ("DV" + DateTime.Now.ToString("yyyyMMddHHmmss") + count),
+                        MemberCode = GetValue(row, "Mã", "Code", "Mã đoàn viên") ?? ("DV" + DateTime.Now.ToString("yyyyMMddHHmmss") + count),
                         Phone = phone,
-                        Email = GetValue(row, "Email", "ThÆ° Ä‘iá»‡n tá»­"),
-                        Address = GetValue(row, "Äá»‹a chá»‰", "Address", "QuÃª quÃ¡n"),
+                        Email = GetValue(row, "Email", "Thư điện tử"),
+                        Address = GetValue(row, "Địa chỉ", "Address", "Quê quán"),
                         Position = position,
-                        CardNumber = GetValue(row, "Sá»‘ tháº»", "Card"),
+                        CardNumber = GetValue(row, "Số thẻ", "Card"),
                         Gender = gender,
                         Ethnicity = ethnicity,
                         Religion = religion,
@@ -457,12 +457,12 @@ namespace QuanLyDoanVien.Api
                         Expertise = expertise,
                         PoliticalTheory = politicalTheory,
                         Notes = notes,
-                        IdentityNumber = GetValue(row, "Sá»‘ CMND", "CCCD", "CMND"),
-                        HealthStatus = GetValue(row, "Sá»©c khá»e", "SK"),
+                        IdentityNumber = GetValue(row, "Số CMND", "CCCD", "CMND"),
+                        HealthStatus = GetValue(row, "Sức khỏe", "SK"),
                         IsActive = true,
                         IsUnionMember = isUnionMember,
                         DateOfBirth = dob,
-                        JoinDate = ParseDate(GetValue(row, "NgÃ y vÃ o Ä‘oÃ n", "NgÃ y káº¿t náº¡p ÄoÃ n")),
+                        JoinDate = ParseDate(GetValue(row, "Ngày vào đoàn", "Ngày kết nạp Đoàn")),
                         PartyDateProbationary = partyProb,
                         PartyDateOfficial = partyOff,
                         CreatedBy = userId,
@@ -477,15 +477,15 @@ namespace QuanLyDoanVien.Api
                 {
                     var firstRow = data.First();
                     var debugInfo = string.Join(" | ", firstRow.Take(8).Select(kv => $"{kv.Key}: {kv.Value}"));
-                    return Ok(new { success = false, count = 0, message = $"KhÃ´ng tÃ¬m tháº¥y dá»¯ liá»‡u há»£p lá»‡. Keys: {debugInfo}" });
+                    return Ok(new { success = false, count = 0, message = $"Không tìm thấy dữ liệu hợp lệ. Keys: {debugInfo}" });
                 }
 
                 db.SaveChanges();
                 
                 new AuditService(db).Log(userId, username, "IMPORT_MEMBER", "DOAN_VIEN", 
-                    $"Import thÃ nh cÃ´ng {count} Ä‘oÃ n viÃªn tá»« file: {attachment.OriginalName} (ID: {attachment.Id})");
+                    $"Import thành công {count} đoàn viên từ file: {attachment.OriginalName} (ID: {attachment.Id})");
 
-                return Ok(new { success = true, count, message = $"ÄÃ£ import thÃ nh cÃ´ng {count} báº£n ghi." });
+                return Ok(new { success = true, count, message = $"Đã import thành công {count} bản ghi." });
             }
         }
 
@@ -493,14 +493,14 @@ namespace QuanLyDoanVien.Api
         {
             if (string.IsNullOrEmpty(val)) return false;
             var v = val.ToLower().Trim();
-            return v == "x" || v == "âœ“" || v == "âœ”" || v == "v";
+            return v == "x" || v == "✓" || v == "✔" || v == "v";
         }
 
         private bool IsTrue(string val)
         {
             if (string.IsNullOrEmpty(val)) return false;
             val = val.ToLower().Trim();
-            return val == "true" || val == "1" || val == "x" || val == "cÃ³" || val == "yes" || val == "Ä‘Ãºng";
+            return val == "true" || val == "1" || val == "x" || val == "có" || val == "yes" || val == "đúng";
         }
 
         private DateTime? ParseDate(string val)
@@ -549,5 +549,36 @@ namespace QuanLyDoanVien.Api
         public string SheetName { get; set; }
     }
 
-}
+    [RoutePrefix("api/audit")]
+    [ApiAuthorize]
+    public class AuditApiController : ApiController
+    {
+        [HttpGet, Route("")]
+        public IHttpActionResult GetLogs(int page = 1, int pageSize = 20, string search = "")
+        {
+            using (var db = new AppDbContext())
+            {
+                var q = db.AuditLogs.AsQueryable();
 
+                if (!string.IsNullOrEmpty(search))
+                {
+                    q = q.Where(l => (l.Username != null && l.Username.Contains(search))
+                                  || (l.Action != null && l.Action.Contains(search))
+                                  || (l.Module != null && l.Module.Contains(search))
+                                  || (l.Description != null && l.Description.Contains(search)));
+                }
+
+                var total = q.Count();
+                var items = q.OrderByDescending(l => l.CreatedAt)
+                             .Skip((page - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(l => new {
+                                 l.Id, l.UserId, l.Username, l.Action, 
+                                 l.Module, l.Description, l.IpAddress, l.CreatedAt
+                             }).ToList();
+
+                return Ok(new { total, page, pageSize, items });
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Http;
 using System.Web;
 using QuanLyDoanVien.Models;
@@ -13,7 +13,7 @@ namespace QuanLyDoanVien.Api
         public IHttpActionResult Login([FromBody] LoginRequest req)
         {
             if (req == null || string.IsNullOrEmpty(req.Username))
-                return BadRequest("Vui lÃ²ng nháº­p tÃªn Ä‘Äƒng nháº­p.");
+                return BadRequest("Vui lòng nhập tên đăng nhập.");
 
             using (var db = new AppDbContext())
             {
@@ -63,7 +63,7 @@ namespace QuanLyDoanVien.Api
         public IHttpActionResult ChangePassword([FromBody] ChangePasswordRequest req)
         {
             if (string.IsNullOrEmpty(req?.OldPassword) || string.IsNullOrEmpty(req.NewPassword))
-                return BadRequest("Vui lÃ²ng nháº­p Ä‘áº§y Ä‘á»§ thÃ´ng tin.");
+                return BadRequest("Vui lòng nhập đầy đủ thông tin.");
 
             var userId = (int)Request.Properties["CurrentUserId"];
             using (var db = new AppDbContext())
@@ -71,14 +71,14 @@ namespace QuanLyDoanVien.Api
                 var user = db.Users.Find(userId);
                 if (!Helpers.PasswordHelper.VerifyPassword(req.OldPassword, user.PasswordHash, user.PasswordSalt))
                     return Content(System.Net.HttpStatusCode.BadRequest,
-                        new { success = false, message = "Máº­t kháº©u cÅ© khÃ´ng chÃ­nh xÃ¡c." });
+                        new { success = false, message = "Mật khẩu cũ không chính xác." });
 
                 user.PasswordSalt = Helpers.PasswordHelper.GenerateSalt();
                 user.PasswordHash = Helpers.PasswordHelper.HashPassword(req.NewPassword, user.PasswordSalt);
                 user.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
             }
-            return Ok(new { success = true, message = "Äá»•i máº­t kháº©u thÃ nh cÃ´ng." });
+            return Ok(new { success = true, message = "Đổi mật khẩu thành công." });
         }
 
         private string GetBearerToken()
@@ -105,4 +105,3 @@ namespace QuanLyDoanVien.Api
         public string NewPassword { get; set; }
     }
 }
-

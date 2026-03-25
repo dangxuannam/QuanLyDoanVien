@@ -26,13 +26,16 @@ Chuyên môn - Tiến sỹ_23
 Lý luận chính trị - Sơ cấp
 Lý luận chính trị - Trung cấp
 Lý luận chính trị - Cao cấp, cử nhân
-Tham gia cấp ủy
-cấp trên cơ sở
-Tham gia cấp ủy
-cơ sở
+Tham gia cấp ủy cấp trên cơ sở
+Tham gia cấp ủy cơ sở
 Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Ban chấp hành
 Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Ban thường vụ
 Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Bí thư
 Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Phó Bí thư
 Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Chuyên môn
 Số đoàn viên đảm nhiệm các chức vụ chủ chốt
+Col35
+Col36
+Col37
+Col38
+Col39

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -24,15 +24,15 @@ namespace QuanLyDoanVien.Api
         {
             var httpRequest = HttpContext.Current.Request;
             if (httpRequest.Files.Count == 0)
-                return BadRequest("KhÃ´ng cÃ³ file nÃ o Ä‘Æ°á»£c táº£i lÃªn.");
+                return BadRequest("Không có file nào được tải lên.");
 
             var file = httpRequest.Files[0];
             if (file.ContentLength == 0)
-                return BadRequest("File rá»—ng.");
+                return BadRequest("File rỗng.");
 
             long maxSize = 52428800; // 50MB
             if (file.ContentLength > maxSize)
-                return BadRequest("File vÆ°á»£t quÃ¡ dung lÆ°á»£ng cho phÃ©p (50MB).");
+                return BadRequest("File vượt quá dung lượng cho phép (50MB).");
 
             var module = httpRequest.Form["module"];
             var desc = httpRequest.Form["description"];
@@ -115,7 +115,7 @@ namespace QuanLyDoanVien.Api
 
                 new AuditService(db).Log((int)Request.Properties["CurrentUserId"],
                     Request.Properties["CurrentUsername"]?.ToString(),
-                    "GET_FILES", "FILE", $"Láº¥y danh sÃ¡ch file (Total: {total})");
+                    "GET_FILES", "FILE", $"Lấy danh sách file (Total: {total})");
 
                 return Ok(new { total, page, pageSize, items });
             }
@@ -128,12 +128,12 @@ namespace QuanLyDoanVien.Api
             {
                 var attachment = db.FileAttachments.Find(id);
                 if (attachment == null)
-                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File khÃ´ng tá»“n táº¡i.");
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File không tồn tại.");
 
                 var fileSvc = new FileService(db);
                 var fullPath = fileSvc.GetFullPath(attachment.FilePath);
                 if (!File.Exists(fullPath))
-                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File khÃ´ng tÃ¬m tháº¥y trÃªn server.");
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File không tìm thấy trên server.");
 
                 var result = Request.CreateResponse(HttpStatusCode.OK);
                 result.Content = new StreamContent(File.OpenRead(fullPath));
@@ -159,11 +159,11 @@ namespace QuanLyDoanVien.Api
                 var fileSvc = new FileService(db);
                 var fullPath = fileSvc.GetFullPath(attachment.FilePath);
                 if (!File.Exists(fullPath))
-                    return BadRequest("File khÃ´ng tÃ¬m tháº¥y trÃªn server.");
+                    return BadRequest("File không tìm thấy trên server.");
 
                 var ext = Path.GetExtension(attachment.OriginalName).ToLower();
                 if (ext != ".xlsx" && ext != ".xls")
-                    return BadRequest("File khÃ´ng pháº£i Ä‘á»‹nh dáº¡ng Excel.");
+                    return BadRequest("File không phải định dạng Excel.");
 
                 var excelSvc = new ExcelService();
                 var result = excelSvc.ParseExcel(fullPath);
@@ -179,9 +179,8 @@ namespace QuanLyDoanVien.Api
             {
                 var fileSvc = new FileService(db);
                 if (!fileSvc.DeleteFile(id)) return NotFound();
-                return Ok(new { success = true, message = "ÄÃ£ xÃ³a file." });
+                return Ok(new { success = true, message = "Đã xóa file." });
             }
         }
     }
 }
-

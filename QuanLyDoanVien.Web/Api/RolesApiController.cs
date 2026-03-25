@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Linq;
 using System.Web.Http;
@@ -70,9 +70,9 @@ namespace QuanLyDoanVien.Api
                     (int)Request.Properties["CurrentUserId"],
                     Request.Properties["CurrentUsername"]?.ToString(),
                     "UPDATE_ROLE_PERM", "HE_THONG",
-                    $"Cáº­p nháº­t quyá»n cho vai trÃ²: {role.RoleName}");
+                    $"Cập nhật quyền cho vai trò: {role.RoleName}");
 
-                return Ok(new { success = true, message = "Cáº­p nháº­t quyá»n thÃ nh cÃ´ng." });
+                return Ok(new { success = true, message = "Cập nhật quyền thành công." });
             }
         }
 
@@ -128,4 +128,3 @@ namespace QuanLyDoanVien.Api
         public List<int> PermissionIds { get; set; }
     }
 }
-

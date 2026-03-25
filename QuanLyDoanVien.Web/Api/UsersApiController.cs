@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -65,15 +65,15 @@ namespace QuanLyDoanVien.Api
         public IHttpActionResult Create([FromBody] CreateUserRequest req)
         {
             if (string.IsNullOrEmpty(req?.Username) || string.IsNullOrEmpty(req.FullName))
-                return BadRequest("TÃªn Ä‘Äƒng nháº­p vÃ  há» tÃªn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng.");
+                return BadRequest("Tên đăng nhập và họ tên không được để trống.");
 
             using (var db = new AppDbContext())
             {
-                // Kiá»ƒm tra user cÃ¹ng tÃªn Ä‘ang HOáº T Äá»˜NG
+                // Kiá»ƒm tra user cÃ¹ng tÃªn Ä'ang HOáº T Ä á»˜NG
                 if (db.Users.Any(u => u.Username == req.Username && u.IsActive))
-                    return BadRequest("TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i.");
+                    return BadRequest("Tên đăng nhập đã tồn tại.");
 
-                // Náº¿u user Ä‘Ã£ tá»“n táº¡i nhÆ°ng bá»‹ vÃ´ hiá»‡u hÃ³a â†’ kÃ­ch hoáº¡t láº¡i
+                // Náº¿u user Ä'Ã£ tá»“n táº¡i nhÆ°ng bá»‹ vÃ´ hiá»‡u hÃ³a â†' kÃ­ch hoáº¡t láº¡i
                 var existingInactive = db.Users.FirstOrDefault(u => u.Username == req.Username && !u.IsActive);
                 if (existingInactive != null)
                 {
@@ -92,9 +92,9 @@ namespace QuanLyDoanVien.Api
 
                     new AuditService(db).Log((int)Request.Properties["CurrentUserId"],
                         Request.Properties["CurrentUsername"]?.ToString(),
-                        "REACTIVATE_USER", "HE_THONG", $"KÃ­ch hoáº¡t láº¡i tÃ i khoáº£n: {existingInactive.Username}");
+                        "REACTIVATE_USER", "HE_THONG", $"Kích hoạt lại tài khoản: {existingInactive.Username}");
                     return Ok(new { success = true, id = existingInactive.Id,
-                        message = $"TÃ i khoáº£n '{existingInactive.Username}' Ä‘Ã£ Ä‘Æ°á»£c kÃ­ch hoáº¡t láº¡i." });
+                        message = $"Tài khoản '{existingInactive.Username}' đã được kích hoạt lại." });
                 }
 
                 var salt = PasswordHelper.GenerateSalt();
@@ -129,10 +129,10 @@ namespace QuanLyDoanVien.Api
                 var audit = new AuditService(db);
                 audit.Log((int)Request.Properties["CurrentUserId"],
                     Request.Properties["CurrentUsername"]?.ToString(),
-                    "CREATE_USER", "HE_THONG", $"Táº¡o ngÆ°á»i dÃ¹ng: {user.Username}");
+                    "CREATE_USER", "HE_THONG", $"Tạo người dùng: {user.Username}");
 
                 return Ok(new { success = true, id = user.Id,
-                    message = $"Táº¡o tÃ i khoáº£n '{user.Username}' thÃ nh cÃ´ng." });
+                    message = $"Tạo tài khoản '{user.Username}' thành công." });
             }
         }
 
@@ -171,9 +171,9 @@ namespace QuanLyDoanVien.Api
                 db.SaveChanges();
                 new AuditService(db).Log((int)Request.Properties["CurrentUserId"],
                     Request.Properties["CurrentUsername"]?.ToString(),
-                    "UPDATE_USER", "HE_THONG", $"Cáº­p nháº­t ngÆ°á»i dÃ¹ng: {user.Username}");
+                    "UPDATE_USER", "HE_THONG", $"Cập nhật người dùng: {user.Username}");
 
-                return Ok(new { success = true, message = "Cáº­p nháº­t thÃ nh cÃ´ng." });
+                return Ok(new { success = true, message = "Cập nhật thành công." });
             }
         }
 
@@ -182,7 +182,7 @@ namespace QuanLyDoanVien.Api
         public IHttpActionResult Delete(int id)
         {
             var currentUserId = (int)Request.Properties["CurrentUserId"];
-            if (id == currentUserId) return BadRequest("KhÃ´ng thá»ƒ xÃ³a tÃ i khoáº£n Ä‘ang Ä‘Äƒng nháº­p.");
+            if (id == currentUserId) return BadRequest("Không thể xóa tài khoản đang đăng nhập.");
 
             using (var db = new AppDbContext())
             {
@@ -190,7 +190,7 @@ namespace QuanLyDoanVien.Api
                 if (user == null) return NotFound();
                 var currentUsername = Request.Properties["CurrentUsername"]?.ToString();
                 if (user.IsAdmin && currentUsername != "admin") 
-                    return BadRequest("Chá»‰ quáº£n trá»‹ viÃªn chÃ­nh má»›i cÃ³ quyá»n xÃ³a tÃ i khoáº£n admin khÃ¡c.");
+                    return BadRequest("Chỉ quản trị viên chính mới có quyền xóa tài khoản admin khác.");
 
                 user.IsActive = false; // Soft delete
                 user.UpdatedAt = DateTime.Now;
@@ -198,9 +198,9 @@ namespace QuanLyDoanVien.Api
 
                 new AuditService(db).Log(currentUserId,
                     Request.Properties["CurrentUsername"]?.ToString(),
-                    "DELETE_USER", "HE_THONG", $"VÃ´ hiá»‡u hÃ³a ngÆ°á»i dÃ¹ng: {user.Username}");
+                    "DELETE_USER", "HE_THONG", $"Vô hiệu hóa người dùng: {user.Username}");
 
-                return Ok(new { success = true, message = "ÄÃ£ vÃ´ hiá»‡u hÃ³a tÃ i khoáº£n." });
+                return Ok(new { success = true, message = "Đã vô hiệu hóa tài khoản." });
             }
         }
     }
@@ -229,4 +229,3 @@ namespace QuanLyDoanVien.Api
         public List<int> RoleIds { get; set; }
     }
 }
-
