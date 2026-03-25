@@ -1,4 +1,4 @@
-$connString = "Server=(localdb)\MSSQLLocalDB;Database=QuanLyDauTu;Integrated Security=True"
+﻿$connString = "Server=(localdb)\MSSQLLocalDB;Database=QuanLyDoanVien;Integrated Security=True"
 $conn = New-Object System.Data.SqlClient.SqlConnection($connString)
 $conn.Open()
 
@@ -11,11 +11,12 @@ function Update-Menu($url, $name) {
 }
 
 Update-Menu "/dashboard" "Dashboard"
-Update-Menu "/members" "Đoàn viên"
-Update-Menu "/members/import" "Nhập Excel"
-Update-Menu "/users" "Người dùng"
-Update-Menu "/roles" "Phân quyền"
-Update-Menu "/audit" "Nhật ký hoạt động"
+Update-Menu "/members" "ÄoÃ n viÃªn"
+Update-Menu "/members/import" "Nháº­p Excel"
+Update-Menu "/users" "NgÆ°á»i dÃ¹ng"
+Update-Menu "/roles" "PhÃ¢n quyá»n"
+Update-Menu "/audit" "Nháº­t kÃ½ hoáº¡t Ä‘á»™ng"
 
 $conn.Close()
 Write-Host "Sidebar updated successfully with proper Unicode strings."
+

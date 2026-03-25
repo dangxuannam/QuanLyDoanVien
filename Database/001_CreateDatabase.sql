@@ -1,24 +1,24 @@
--- =============================================
+﻿-- =============================================
 -- HE THONG QUAN LY DAU TU TINH LAM DONG
 -- Database Schema - SQL Server 2019/2022
--- Windows Authentication | DB: QuanLyDauTu
+-- Windows Authentication | DB: QuanLyDoanVien
 -- =============================================
 
 USE master;
 GO
 
-IF EXISTS (SELECT name FROM sys.databases WHERE name = N'QuanLyDauTu')
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'QuanLyDoanVien')
 BEGIN
-    ALTER DATABASE QuanLyDauTu SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE QuanLyDauTu;
+    ALTER DATABASE QuanLyDoanVien SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE QuanLyDoanVien;
 END
 GO
 
-CREATE DATABASE QuanLyDauTu
+CREATE DATABASE QuanLyDoanVien
     COLLATE Vietnamese_CI_AS;
 GO
 
-USE QuanLyDauTu;
+USE QuanLyDoanVien;
 GO
 
 -- =============================================
@@ -490,3 +490,4 @@ CREATE INDEX IX_MapProjects_IsPublic ON MapProjects(IsPublic);
 
 PRINT 'Database schema created successfully!';
 GO
+

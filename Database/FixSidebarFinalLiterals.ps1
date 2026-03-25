@@ -1,4 +1,4 @@
-$connString = "Server=(localdb)\MSSQLLocalDB;Database=QuanLyDauTu;Integrated Security=True"
+﻿$connString = "Server=(localdb)\MSSQLLocalDB;Database=QuanLyDoanVien;Integrated Security=True"
 $conn = New-Object System.Data.SqlClient.SqlConnection($connString)
 $conn.Open()
 $cmd = $conn.CreateCommand()
@@ -13,16 +13,16 @@ function Update-Menu($url, $name) {
 }
 
 # Building strings using [char] to avoid script encoding issues
-# Đoàn viên
-$doanVien = [char]0x0110 + "o" + [char]0x00E0 + "n viên"
-# Nhập Excel
+# ÄoÃ n viÃªn
+$doanVien = [char]0x0110 + "o" + [char]0x00E0 + "n viÃªn"
+# Nháº­p Excel
 $nhapExcel = "Nh" + [char]0x1EAD + "p Excel"
-# Người dùng
-$nguoiDung = "Ng" + [char]0x01B0 + [char]0x1EDD + "i dùng"
-# Phân quyền 
-$phanQuyen = "Phân quy" + [char]0x1EC1 + "n"
-# Nhật ký hoạt động
-$nhatKy = "Nh" + [char]0x1EAD + "t ký ho" + [char]0x1EA1 + "t " + [char]0x0111 + [char]0x1ED9 + "ng"
+# NgÆ°á»i dÃ¹ng
+$nguoiDung = "Ng" + [char]0x01B0 + [char]0x1EDD + "i dÃ¹ng"
+# PhÃ¢n quyá»n 
+$phanQuyen = "PhÃ¢n quy" + [char]0x1EC1 + "n"
+# Nháº­t kÃ½ hoáº¡t Ä‘á»™ng
+$nhatKy = "Nh" + [char]0x1EAD + "t kÃ½ ho" + [char]0x1EA1 + "t " + [char]0x0111 + [char]0x1ED9 + "ng"
 
 Update-Menu "/dashboard" "Dashboard"
 Update-Menu "/members" $doanVien
@@ -33,3 +33,4 @@ Update-Menu "/audit" $nhatKy
 
 $conn.Close()
 Write-Host "Sidebar updated using char literals."
+
