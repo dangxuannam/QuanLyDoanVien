@@ -1,0 +1,83 @@
+<div class="page-header">
+  <h2><mat-icon>history</mat-icon> Nhật ký thao tác</h2>
+  <div class="header-actions">
+    <div class="filter-bar">
+      <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Tìm kiếm theo username, hành động..." [(ngModel)]="search" (keyup.enter)="onSearch()">
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="onSearch()">
+        <mat-icon>filter_list</mat-icon> Lọc
+      </button>
+    </div>
+  </div>
+</div>
+
+<mat-card>
+  <div class="loading-center" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <table mat-table [dataSource]="items" class="full-width" *ngIf="!loading">
+    <ng-container matColumnDef="time">
+      <th mat-header-cell *matHeaderCellDef> Thời gian </th>
+      <td mat-cell *matCellDef="let row"> {{ row.createdAt | date:'dd/MM/yyyy HH:mm:ss' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="user">
+      <th mat-header-cell *matHeaderCellDef> Người dùng </th>
+      <td mat-cell *matCellDef="let row"> <strong>{{ row.username }}</strong> </td>
+    </ng-container>
+
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef> Hành động </th>
+      <td mat-cell *matCellDef="let row">
+        <span class="badge" [ngClass]="getActionColor(row.action)">{{ row.action }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="module">
+      <th mat-header-cell *matHeaderCellDef> Module </th>
+      <td mat-cell *matCellDef="let row"> {{ getModuleDisplay(row.module) }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef> Chi tiết </th>
+      <td mat-cell *matCellDef="let row"> {{ row.description }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="ip">
+      <th mat-header-cell *matHeaderCellDef> IP </th>
+      <td mat-cell *matCellDef="let row"> {{ row.ipAddress || '-' }} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data" colspan="6"> Không tìm thấy dữ liệu nhật ký. </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="total"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+</mat-card>
+
+<style>
+  .badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #e0e0e0;
+  }
+  .badge.success { background: #e8f5e9; color: #2e7d32; }
+  .badge.primary { background: #e8eaf6; color: #3f51b5; }
+  .badge.warn { background: #ffebee; color: #c62828; }
+  .badge.accent { background: #fff3e0; color: #ef6c00; }
+</style>

@@ -1,0 +1,82 @@
+<mat-sidenav-container class="app-container" autosize>
+  <!-- SIDEBAR -->
+  <mat-sidenav #sidenav [opened]="sidebarOpen" mode="side" class="sidebar">
+    <div class="sidebar-header">
+      <mat-icon class="sidebar-logo-icon">groups</mat-icon>
+      <span class="sidebar-title">Quản lý đoàn viên</span>
+    </div>
+
+    <div class="sidebar-user">
+      <mat-icon class="user-avatar-icon">account_circle</mat-icon>
+      <div class="user-info">
+        <strong>{{ user?.fullName }}</strong>
+        <small>{{ user?.username }}</small>
+      </div>
+    </div>
+
+    <mat-nav-list class="sidebar-nav">
+      <!-- Dynamic menus from database -->
+      <ng-container *ngFor="let menu of rootMenus">
+        <!-- With children -->
+        <mat-expansion-panel *ngIf="hasChildren(menu.id)" class="sidebar-panel">
+          <mat-expansion-panel-header class="sidebar-panel-header">
+            <mat-icon matPrefix>{{ getMaterialIcon(menu.icon) }}</mat-icon>
+            <span>{{ menu.menuName }}</span>
+          </mat-expansion-panel-header>
+          <mat-nav-list>
+            <a mat-list-item *ngFor="let child of childMenus[menu.id]" (click)="navigate(child.url)"
+              [class.active-link]="isActive(child.url || '')">
+              <mat-icon matListItemIcon>{{ getMaterialIcon(child.icon) }}</mat-icon>
+              <span matListItemTitle>{{ child.menuName }}</span>
+            </a>
+          </mat-nav-list>
+        </mat-expansion-panel>
+
+        <!-- No children -->
+        <a mat-list-item *ngIf="!hasChildren(menu.id) && menu.url" (click)="navigate(menu.url)"
+          [class.active-link]="isActive(menu.url)">
+          <mat-icon matListItemIcon>{{ getMaterialIcon(menu.icon) }}</mat-icon>
+          <span matListItemTitle>{{ menu.menuName }}</span>
+        </a>
+      </ng-container>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- MAIN CONTENT -->
+  <mat-sidenav-content class="main-content">
+    <mat-toolbar class="topbar">
+      <button mat-icon-button (click)="toggleSidebar()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="topbar-title">Hệ thống Quản lý Đoàn viên</span>
+      <span class="spacer"></span>
+
+      <div *ngIf="user?.isAdmin" class="admin-chip">
+        <mat-icon>shield_person</mat-icon> Quản trị viên
+      </div>
+
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+        <mat-icon>account_circle</mat-icon>
+        <span class="user-name">{{ user?.fullName }}</span>
+        <mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-menu-header">
+          <strong>{{ user?.fullName }}</strong><br>
+          <small>{{ user?.donVi || user?.username }}</small>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item routerLink="/profile"><mat-icon>person</mat-icon> Hồ sơ cá nhân</button>
+        <button mat-menu-item routerLink="/change-password"><mat-icon>key</mat-icon> Đổi mật khẩu</button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()"><mat-icon color="warn">logout</mat-icon> Đăng xuất</button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <div class="page-content-wrapper">
+      <div class="page-content">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

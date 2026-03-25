@@ -1,0 +1,37 @@
+﻿node.exe : - Building...
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (- Bui 
+   lding...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Application bundle generation failed. [8.825 seconds]
+
+X [ERROR] NG5: Argument of type 'string | 
+undefined' is not assignable to parameter of type 
+'string'.
+  Type 'undefined' is not assignable to type 
+'string'. [plugin angular-compiler]
+
+    src/app/layout/main-layout/main-layout.componen
+t.html:35:39:
+      35 Γöé ...      
+(click)="navigate(child.url)" 
+[class.active-link]="isActi...
+         Γò╡                                  ~~~
+
+  Error occurs in the template of component 
+MainLayoutComponent.
+
+    src/app/layout/main-layout/main-layout.componen
+t.ts:10:15:
+      10 Γöé   templateUrl: 
+'./main-layout.component.html'
+         Γò╡                
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+

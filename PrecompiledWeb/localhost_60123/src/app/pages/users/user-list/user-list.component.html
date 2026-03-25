@@ -1,0 +1,73 @@
+<div class="page-header">
+  <h2><mat-icon>people</mat-icon> Quản lý Tài khoản</h2>
+  <button mat-raised-button color="primary" routerLink="/users/create">
+    <mat-icon>person_add</mat-icon> Tạo tài khoản
+  </button>
+</div>
+
+<mat-card>
+  <mat-card-content>
+    <div class="filter-bar">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Tìm kiếm</mat-label>
+        <input matInput [(ngModel)]="search" (keyup.enter)="load()" placeholder="Tên, username, email...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="load()">
+        <mat-icon>search</mat-icon> Tìm
+      </button>
+    </div>
+
+    <mat-spinner *ngIf="loading" diameter="40" class="center-spinner"></mat-spinner>
+
+    <table mat-table [dataSource]="users" class="full-width mat-elevation-z2" *ngIf="!loading">
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef>Username</th>
+        <td mat-cell *matCellDef="let u">
+          <strong>{{ u.username }}</strong>
+          <mat-chip *ngIf="u.isAdmin" color="accent" selected style="margin-left:8px;font-size:10px">Admin</mat-chip>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="fullName">
+        <th mat-header-cell *matHeaderCellDef>Họ tên</th>
+        <td mat-cell *matCellDef="let u">{{ u.fullName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+      </ng-container>
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef>SĐT</th>
+        <td mat-cell *matCellDef="let u">{{ u.phone }}</td>
+      </ng-container>
+      <ng-container matColumnDef="donVi">
+        <th mat-header-cell *matHeaderCellDef>Đơn vị</th>
+        <td mat-cell *matCellDef="let u">{{ u.donVi }}</td>
+      </ng-container>
+      <ng-container matColumnDef="active">
+        <th mat-header-cell *matHeaderCellDef>Trạng thái</th>
+        <td mat-cell *matCellDef="let u">
+          <mat-chip [color]="u.isActive ? 'primary' : 'warn'" selected>
+            {{ u.isActive ? 'Hoạt động' : 'Vô hiệu' }}
+          </mat-chip>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Thao tác</th>
+        <td mat-cell *matCellDef="let u">
+          <button mat-icon-button color="primary" (click)="edit(u.id)" matTooltip="Chỉnh sửa"><mat-icon>edit</mat-icon></button>
+          <button mat-icon-button [color]="u.isActive ? 'warn' : 'accent'" (click)="toggleActive(u)"
+            [matTooltip]="u.isActive ? 'Khóa' : 'Mở khóa'" *ngIf="!u.isAdmin">
+            <mat-icon>{{ u.isActive ? 'lock' : 'lock_open' }}</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="delete(u)" matTooltip="Xóa" *ngIf="!u.isAdmin">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow><td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">Không có dữ liệu</td></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

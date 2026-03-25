@@ -1,0 +1,17 @@
+﻿import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../../core/services/api.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+@Component({ selector: 'app-change-password', templateUrl: './change-password.component.html' })
+export class ChangePasswordComponent implements OnInit {
+  loading = false;
+  data: any = {};
+  items: any[] = [];
+  total = 0;
+  search = '';
+  page = 1; pageSize = 15;
+
+  constructor(protected api: ApiService, protected router: Router, protected route: ActivatedRoute, protected snack: MatSnackBar) {}
+  ngOnInit(): void {}
+}
