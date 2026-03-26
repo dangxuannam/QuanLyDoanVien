@@ -46,7 +46,8 @@ Hệ thống sử dụng SQL Server LocalDB cho môi trường phát triển (`(
    
    `<add name="QuanLyDoanVienContext" connectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=QuanLyDoanVien;Integrated Security=True;..." providerName="System.Data.SqlClient" />`
    
-3. Nhấn `F5` hoặc chọn **IIS Express** (Port `52369`) để chạy dự án Backend. 
+3. Nhấn `F5` hoặc chọn **IIS Express** (Port `52369`) để chạy dự án Backend.Hoặc khi download về hãy dùng đường dẫn đã tải ( ví dụ : `& "C:\Program Files (x86)\IIS Express\iisexpress.exe" /path:"C:\QuanLyDoanVien\QuanLyDoanVien.Web" /port:52369`)
+/path : " Đường dẫn tải\IISExpress\iisexpress.exe "/port:52369
 4. URL Backend gốc sẽ là: `http://localhost:52369/`
 
 ### 3. Khởi chạy Frontend (Angular)
