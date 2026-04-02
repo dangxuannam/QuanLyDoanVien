@@ -1,15 +1,17 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ApiService } from '../../../core/services/api.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-unit-list',
   templateUrl: './unit-list.component.html'
 })
-export class UnitListComponent implements OnInit {
+export class UnitListComponent implements OnInit, OnDestroy {
   @ViewChild('formTpl')    formTpl!:    TemplateRef<any>;
   @ViewChild('importTpl')  importTpl!:  TemplateRef<any>;
   @ViewChild('summaryTpl') summaryTpl!: TemplateRef<any>;
@@ -23,6 +25,10 @@ export class UnitListComponent implements OnInit {
   search        = '';
   loading       = false;
   displayedColumns = ['select', 'unitName', 'totalMembers', 'lastImportAt', 'actions'];
+
+  /* ── RxJS: debounce search ──────────────────────────────────────────── */
+  private searchSubject = new Subject<string>();
+  private destroy$      = new Subject<void>();
 
   /* ── Checkbox chọn hàng loạt ─────────────────────────────────────────── */
   selection = new SelectionModel<any>(true, []);
@@ -81,7 +87,18 @@ export class UnitListComponent implements OnInit {
     private snack:  MatSnackBar
   ) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    // Debounce tìm kiếm tự động sau 400ms ngừng gõ
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => { this.page = 1; this.load(); });
+
+    this.load();
+  }
+
+  ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
 
   /* ──────────────────── DANH SÁCH ─────────────────────────────────────── */
   load() {
@@ -94,7 +111,10 @@ export class UnitListComponent implements OnInit {
       error: () => this.loading = false
     });
   }
-  onSearch()    { this.page = 1; this.load(); }
+
+  onSearchInput() { this.searchSubject.next(this.search); }
+  clearSearch()   { this.search = ''; this.page = 1; this.load(); }
+  onSearch()      { this.page = 1; this.load(); }
   onPageChange(e: PageEvent) { this.page = e.pageIndex + 1; this.pageSize = e.pageSize; this.load(); }
 
   /* ──── checkbox ──────────────────────────────────────────────────────── */

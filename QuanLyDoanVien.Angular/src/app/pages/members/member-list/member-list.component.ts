@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
 import { ApiService } from '../../../core/services/api.service';
 import { Member, MemberGroup } from '../../../core/models/models';
 import { SelectionModel } from '@angular/cdk/collections';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({ selector: 'app-member-list', templateUrl: './member-list.component.html' })
-export class MemberListComponent implements OnInit {
+export class MemberListComponent implements OnInit, OnDestroy {
   members: Member[] = [];
   selection = new SelectionModel<Member>(true, []);
   total     = 0;
@@ -16,17 +18,18 @@ export class MemberListComponent implements OnInit {
   search    = '';
   loading   = false;
 
+  /* ── RxJS: debounce search ──────────────────────────────────────────── */
+  private searchSubject = new Subject<string>();
+  private destroy$      = new Subject<void>();
+
   /* ── Bộ lọc ──────────────────────────────────────────────────────── */
   groups: MemberGroup[]     = [];
-  units: any[] = [];
+  units: any[]              = [];
   selectedGroupId: number | null = null;
   selectedLevel: string | null   = null;
   selectedUnitId: number | null  = null;
 
-  /** Danh sách cấp bậc cố định */
-  readonly LEVELS = [
-    'Trung ương', 'Tỉnh', 'Thành phố', 'Huyện', 'Xã / Phường', 'Cơ sở'
-  ];
+  readonly LEVELS = ['Trung ương', 'Tỉnh', 'Thành phố', 'Huyện', 'Xã / Phường', 'Cơ sở'];
 
   displayedColumns = [
     'select', 'fullName', 'gender', 'birthDate',
@@ -36,7 +39,20 @@ export class MemberListComponent implements OnInit {
 
   constructor(private api: ApiService, private router: Router, private snack: MatSnackBar) {}
 
-  ngOnInit() { this.loadGroups(); this.loadUnits(); this.load(); }
+  ngOnInit() {
+    // Debounce 400ms: tự động tìm kiếm khi ngừng gõ hoặc xóa trắng
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => { this.page = 1; this.load(); });
+
+    this.loadGroups();
+    this.loadUnits();
+    this.load();
+  }
+
+  ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
 
   loadGroups() {
     this.api.getMemberGroups().subscribe({ next: r => this.groups = r, error: () => {} });
@@ -59,16 +75,19 @@ export class MemberListComponent implements OnInit {
     });
   }
 
+  /* Gọi mỗi khi người dùng gõ/xóa ký tự trong ô tìm kiếm */
+  onSearchInput() { this.searchSubject.next(this.search); }
+
+  /* Xóa nhanh và reload ngay */
+  clearSearch() { this.search = ''; this.page = 1; this.load(); }
+
+  /* Vẫn giữ tìm kiếm khi nhấn Enter ngay lập tức (không đợi debounce) */
+  searchMembers() { this.page = 1; this.load(); }
+
   onGroupChange() { this.page = 1; this.load(); }
   onUnitChange()  { this.page = 1; this.load(); }
-  onLevelChange() {
-    // Khi đổi cấp bậc → reset chi đoàn nếu chi đoàn đó không thuộc cấp đã chọn
-    this.selectedGroupId = null;
-    this.page = 1;
-    this.load();
-  }
+  onLevelChange() { this.selectedGroupId = null; this.page = 1; this.load(); }
 
-  /** Lọc danh sách chi đoàn theo cấp bậc đang chọn */
   get filteredGroups(): MemberGroup[] {
     if (!this.selectedLevel) return this.groups;
     return this.groups.filter(g => (g as any).level === this.selectedLevel);
@@ -90,9 +109,7 @@ export class MemberListComponent implements OnInit {
     this.load();
   }
 
-  searchMembers() { this.page = 1; this.load(); }
-
-  create() { this.router.navigate(['/members/create']); }
+  create()       { this.router.navigate(['/members/create']); }
   edit(id: number) { this.router.navigate(['/members', id, 'edit']); }
 
   delete(m: Member) {
@@ -104,21 +121,16 @@ export class MemberListComponent implements OnInit {
 
   isAllSelected() { return this.selection.selected.length === this.members.length; }
   masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.members.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.members.forEach(row => this.selection.select(row));
   }
 
   deleteSelected() {
     const ids = this.selection.selected.map(m => m.id!);
-    if (ids.length === 0) return;
+    if (!ids.length) return;
     if (confirm(`Bạn có chắc muốn xóa ${ids.length} đoàn viên đã chọn?`)) {
       this.api.deleteMembers(ids).subscribe({
-        next: () => {
-          this.snack.open(`Đã xóa ${ids.length} đoàn viên`, 'Đóng', { duration: 3000 });
-          this.selection.clear(); this.load();
-        },
-        error: (err) => this.snack.open('Lỗi khi xóa: ' + (err.error?.message || err.message), 'Đóng', { duration: 5000 })
+        next: () => { this.snack.open(`Đã xóa ${ids.length} đoàn viên`, 'Đóng', { duration: 3000 }); this.selection.clear(); this.load(); },
+        error: (err) => this.snack.open('Lỗi: ' + (err.error?.message || err.message), 'Đóng', { duration: 5000 })
       });
     }
   }
@@ -126,7 +138,7 @@ export class MemberListComponent implements OnInit {
   exportExcel() { window.location.href = this.api.exportMembersUrl(this.search); }
 
   deleteAll() {
-    if (confirm('CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ danh sách đoàn viên? Hành động này không thể hoàn tác.')) {
+    if (confirm('CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ danh sách đoàn viên?')) {
       this.api.deleteAllMembers().subscribe({
         next: () => { this.snack.open('Đã xóa toàn bộ danh sách', 'Đóng', { duration: 3000 }); this.load(); },
         error: (err) => this.snack.open('Lỗi: ' + (err.error?.message || err.message), 'Đóng', { duration: 5000 })

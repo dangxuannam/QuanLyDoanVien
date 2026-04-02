@@ -21,10 +21,13 @@
   <!-- ── FILTER BAR: tìm kiếm + combobox chỉ tiêu ─────────────────────── -->
   <mat-card class="filter-bar">
     <mat-card-content style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <mat-form-field appearance="outline" style="flex:1;min-width:200px">
+      <mat-form-field appearance="outline" style="flex:1;min-width:200px" subscriptSizing="dynamic">
         <mat-label>Tìm kiếm đơn vị</mat-label>
-        <input matInput [(ngModel)]="search" (keyup.enter)="onSearch()" placeholder="Nhập tên hoặc mã đơn vị…">
-        <button matSuffix mat-icon-button (click)="onSearch()"><mat-icon>search</mat-icon></button>
+        <input matInput [(ngModel)]="search" (ngModelChange)="onSearchInput()" (keyup.enter)="onSearch()" placeholder="Nhập tên hoặc mã đơn vị…">
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="search" matSuffix mat-icon-button (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
 
       <!-- Combobox chỉ tiêu (cho bảng tổng hợp gộp) -->

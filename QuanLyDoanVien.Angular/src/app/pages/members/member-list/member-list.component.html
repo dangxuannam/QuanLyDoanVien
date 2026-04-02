@@ -52,10 +52,10 @@
 
       <!-- Tìm kiếm -->
       <div class="search-box" style="display:flex;gap:8px;align-items:center;flex:1;min-width:220px">
-        <mat-form-field appearance="outline" style="flex:1">
-          <input matInput [(ngModel)]="search" placeholder="Tìm kiếm đoàn viên..." (keyup.enter)="searchMembers()">
+        <mat-form-field appearance="outline" style="flex:1" subscriptSizing="dynamic">
+          <input matInput [(ngModel)]="search" (ngModelChange)="onSearchInput()" placeholder="Tìm kiếm đoàn viên..." (keyup.enter)="searchMembers()">
           <mat-icon matPrefix>search</mat-icon>
-          <button *ngIf="search" matSuffix mat-icon-button (click)="search = ''; searchMembers()">
+          <button *ngIf="search" matSuffix mat-icon-button (click)="clearSearch()">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
