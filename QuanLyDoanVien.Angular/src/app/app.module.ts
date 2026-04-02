@@ -57,6 +57,7 @@ import { AuditListComponent } from './pages/audit/audit-list/audit-list.componen
 
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { UnitListComponent } from './pages/units/unit-list/unit-list.component';
 
 const MATERIAL_MODULES = [
   MatToolbarModule, MatSidenavModule, MatListModule, MatIconModule,
@@ -78,7 +79,8 @@ const MATERIAL_MODULES = [
     MemberListComponent, MemberFormComponent, MemberGroupsComponent,
     FileUploadComponent, FileListComponent,
     AuditListComponent,
-    ProfileComponent, ChangePasswordComponent
+    ProfileComponent, ChangePasswordComponent,
+    UnitListComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, HttpClientModule,

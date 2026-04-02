@@ -21,9 +21,38 @@
 
 <mat-card>
   <mat-card-content>
-    <div class="filter-bar">
-      <div class="search-box">
-        <mat-form-field appearance="outline">
+    <div class="filter-bar" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:8px">
+
+      <!-- Lọc theo đơn vị -->
+      <mat-form-field appearance="outline" style="min-width:200px">
+        <mat-label><mat-icon>business</mat-icon> Đơn vị</mat-label>
+        <mat-select [(ngModel)]="selectedUnitId" (ngModelChange)="onUnitChange()">
+          <mat-option [value]="null">— Tất cả đơn vị —</mat-option>
+          <mat-option *ngFor="let u of units" [value]="u.id">{{ u.unitName }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Lọc theo cấp bậc -->
+      <mat-form-field appearance="outline" style="min-width:170px">
+        <mat-label><mat-icon>account_tree</mat-icon> Cấp bậc</mat-label>
+        <mat-select [(ngModel)]="selectedLevel" (ngModelChange)="onLevelChange()">
+          <mat-option [value]="null">— Tất cả cấp —</mat-option>
+          <mat-option *ngFor="let lv of LEVELS" [value]="lv">{{ lv }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Lọc theo chi đoàn (tự động thu hẹp theo cấp bậc đã chọn) -->
+      <mat-form-field appearance="outline" style="min-width:220px">
+        <mat-label><mat-icon>group</mat-icon> Chi đoàn</mat-label>
+        <mat-select [(ngModel)]="selectedGroupId" (ngModelChange)="onGroupChange()">
+          <mat-option [value]="null">— Tất cả chi đoàn —</mat-option>
+          <mat-option *ngFor="let g of filteredGroups" [value]="g.id">{{ g.groupName }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Tìm kiếm -->
+      <div class="search-box" style="display:flex;gap:8px;align-items:center;flex:1;min-width:220px">
+        <mat-form-field appearance="outline" style="flex:1">
           <input matInput [(ngModel)]="search" placeholder="Tìm kiếm đoàn viên..." (keyup.enter)="searchMembers()">
           <mat-icon matPrefix>search</mat-icon>
           <button *ngIf="search" matSuffix mat-icon-button (click)="search = ''; searchMembers()">
@@ -31,6 +60,22 @@
           </button>
         </mat-form-field>
         <button mat-flat-button color="primary" (click)="searchMembers()">Tìm</button>
+      </div>
+
+      <!-- Chip hiển thị filter đang active -->
+      <div *ngIf="selectedUnitId || selectedLevel || selectedGroupId" style="display:flex;gap:6px;flex-wrap:wrap">
+        <mat-chip *ngIf="selectedUnitId" (removed)="selectedUnitId = null; onUnitChange()" [removable]="true">
+          <mat-icon matChipAvatar>business</mat-icon>
+          {{ getUnitName(selectedUnitId) }}
+        </mat-chip>
+        <mat-chip *ngIf="selectedLevel" (removed)="selectedLevel = null; onLevelChange()" [removable]="true">
+          <mat-icon matChipAvatar>account_tree</mat-icon>
+          {{ selectedLevel }}
+        </mat-chip>
+        <mat-chip *ngIf="selectedGroupId" (removed)="selectedGroupId = null; onGroupChange()" [removable]="true">
+          <mat-icon matChipAvatar>group</mat-icon>
+          {{ getGroupName(selectedGroupId) }}
+        </mat-chip>
       </div>
     </div>
 

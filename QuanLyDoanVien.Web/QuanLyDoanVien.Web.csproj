@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -124,7 +124,7 @@
     <Compile Include="Api\AuthApiController.cs" />
     <Compile Include="Api\FileApiController.cs" />
     <Compile Include="Api\OtherApiControllers.cs" />
-
+    <Compile Include="Api\UnitsApiController.cs" />
     <Compile Include="Api\RolesApiController.cs" />
     <Compile Include="Api\UsersApiController.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

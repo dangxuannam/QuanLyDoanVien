@@ -98,6 +98,9 @@ export interface Member {
   joinDate?: string;
   groupId?: number;
   groupName?: string;
+  groupLevel?: string;
+  unitId?: number;
+  unitName?: string;
   position?: string;
   cardNumber?: string;
   isUnionMember: boolean;
@@ -121,6 +124,7 @@ export interface MemberGroup {
   groupName: string;
   description?: string;
   memberCount?: number;
+  level?: string;
 }
 
 export interface FileAttachment {
@@ -201,4 +205,16 @@ export interface KTXHReport {
   quarter?: number;
   value?: number;
   notes?: string;
+}
+
+export interface Unit {
+  id: number;
+  unitCode: string;
+  unitName: string;
+  description?: string;
+  isActive: boolean;
+  totalMembers?: number;
+  lastImportAt?: string;
+  createdAt?: string;
+  hasSummary?: boolean;
 }

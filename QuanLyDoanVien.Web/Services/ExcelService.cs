@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,8 +37,8 @@ namespace QuanLyDoanVien.Services
                     // First row = headers
                     for (int col = 1; col <= totalCols; col++)
                     {
-                        var header = ws.Cells[1, col].Text?.Trim() ?? $"Cá»™t {col}";
-                        sheet.Headers.Add(string.IsNullOrEmpty(header) ? $"Cá»™t {col}" : header);
+                        var header = ws.Cells[1, col].Text?.Trim() ?? $"Cột {col}";
+                        sheet.Headers.Add(string.IsNullOrEmpty(header) ? $"Cột {col}" : header);
                     }
 
                     sheet.TotalRows = totalRows - 1;
@@ -83,7 +83,7 @@ namespace QuanLyDoanVien.Services
                 ExcelWorksheet ws = null;
                 try { ws = package.Workbook.Worksheets[sheetName]; } catch { }
                 if (ws == null && package.Workbook.Worksheets.Count > 0)
-                    ws = package.Workbook.Worksheets[0];
+                    ws = package.Workbook.Worksheets.FirstOrDefault();
                 if (ws == null || ws.Dimension == null) return result;
 
                 int totalRows = ws.Dimension.Rows;
@@ -96,7 +96,7 @@ namespace QuanLyDoanVien.Services
                     for (int c = 1; c <= totalCols; c++)
                     {
                         string txt = ws.Cells[r, c].Text?.ToLower().Trim() ?? "";
-                        if (txt == "há» tÃªn" || txt == "há» vÃ  tÃªn" || txt == "full name" || txt == "stt")
+                        if (txt == "họ tên" || txt == "họ và tên" || txt == "full name" || txt == "stt")
                         {
                             headerRow = r;
                             goto foundHeader;
@@ -212,16 +212,16 @@ namespace QuanLyDoanVien.Services
                                 string subName = colSubs[c];
                                 dict[parentName] = subName;
 
-                                if (parentName.ToLower().Contains("ngÃ y") && parentName.ToLower().Contains("sinh"))
+                                if (parentName.ToLower().Contains("ngày") && parentName.ToLower().Contains("sinh"))
                                 {
                                 }
                                 break;
                             }
                         }
 
-                        bool isDateGroup = parentName.ToLower().Contains("ngÃ y") || 
-                                          parentName.ToLower().Contains("káº¿t náº¡p") ||
-                                          parentName.ToLower().Contains("nÄƒm sinh");
+                        bool isDateGroup = parentName.ToLower().Contains("ngày") || 
+                                          parentName.ToLower().Contains("kết nạp") ||
+                                          parentName.ToLower().Contains("năm sinh");
                         if (isDateGroup)
                         {
                             foreach (int c in group.Value)
@@ -232,17 +232,17 @@ namespace QuanLyDoanVien.Services
                                     if (!dict.ContainsKey(parentName) || string.IsNullOrEmpty(dict[parentName]) || IsChecked(dict[parentName]))
                                     {
                                         dict[parentName] = cellVal;                                      
-                                        dict[parentName + "_gender"] = colSubs[c]; // "Nam" or "Ná»¯"
+                                        dict[parentName + "_gender"] = colSubs[c]; // "Nam" or "Nữ"
                                     }
                                 }
                             }
                         }
                     }
 
-                    if (!dict.ContainsKey("Há» vÃ  tÃªn"))
+                    if (!dict.ContainsKey("Họ và tên"))
                     {
-                        string name = FindValue(dict, "Há» tÃªn", "HOTEN", "FullName");
-                        if (!string.IsNullOrEmpty(name)) dict["Há» vÃ  tÃªn"] = name;
+                        string name = FindValue(dict, "Họ tên", "HOTEN", "FullName");
+                        if (!string.IsNullOrEmpty(name)) dict["Họ và tên"] = name;
                     }
 
                     if (hasData) result.Add(dict);
@@ -289,7 +289,7 @@ namespace QuanLyDoanVien.Services
         {
             if (string.IsNullOrEmpty(val)) return false;
             val = val.ToLower().Trim();
-            return val == "x" || val == "âœ“" || val == "âœ”" || val == "v" || val == "cÃ³" || val == "1" || val == "true";
+            return val == "x" || val == "✓" || val == "✔" || val == "v" || val == "có" || val == "1" || val == "true";
         }
 
         private string FindValue(Dictionary<string, string> row, params string[] keys)
@@ -324,4 +324,5 @@ namespace QuanLyDoanVien.Services
         public bool HasMore { get; set; }
     }
 }
+
 

@@ -18,6 +18,7 @@ import { AuditListComponent } from './pages/audit/audit-list/audit-list.componen
 
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { UnitListComponent } from './pages/units/unit-list/unit-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -43,6 +44,8 @@ const routes: Routes = [
       { path: 'members/import', component: FileUploadComponent, data: { module: 'DOAN_VIEN' } },
       { path: 'members/:id/edit', component: MemberFormComponent },
       { path: 'member-groups', component: MemberGroupsComponent },
+      // Don vi
+      { path: 'units', component: UnitListComponent },
       // Profile
       { path: 'profile', component: ProfileComponent },
       { path: 'change-password', component: ChangePasswordComponent }

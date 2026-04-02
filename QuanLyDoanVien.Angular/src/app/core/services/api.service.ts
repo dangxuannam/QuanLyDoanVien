@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 import {
   AuthResponse, User, Role, Permission, MenuItem, Project, OutsideProject,
   Member, MemberGroup, FileAttachment, ExcelParseResult, PagedResult,
-  AuditLog, MapProject, KTXHIndicator, KTXHReport
+  AuditLog, MapProject, KTXHIndicator, KTXHReport, Unit
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -112,8 +112,13 @@ export class ApiService {
   addKTXHReport(d: any): Observable<any>               { return this.post('/ktxh/reports', d); }
 
   // ─── Members – Đoàn viên ──────────────────────────────────────────────────
-  getMembers(page: number = 1, pageSize: number = 15, search: string = ''): Observable<PagedResult<Member>> {
-    return this.get<PagedResult<Member>>('/members', { page, pageSize, search });
+  getMembers(page: number = 1, pageSize: number = 15, search: string = '', groupId?: number, level?: string, unitId?: number): Observable<PagedResult<Member>> {
+    const params: any = { page, pageSize };
+    if (search) params['search'] = search;
+    if (groupId != null) params['groupId'] = groupId;
+    if (level) params['level'] = level;
+    if (unitId != null) params['unitId'] = unitId;
+    return this.get<PagedResult<Member>>('/members', params);
   }
   getMember(id: number): Observable<Member>             { return this.get(`/members/${id}`); }
   createMember(d: any): Observable<any>                 { return this.post('/members', d); }
@@ -123,11 +128,43 @@ export class ApiService {
   deleteAllMembers(): Observable<any>                  { return this.post('/members/delete-all', {}); }
   getMemberGroups(): Observable<MemberGroup[]>          { return this.get('/members/groups'); }
   createMemberGroup(d: any): Observable<any>            { return this.post('/members/groups', d); }
-  getMemberStats(): Observable<any>                     { return this.get('/members/stats'); }
+  updateMemberGroup(id: number, d: any): Observable<any>{ return this.put(`/members/groups/${id}`, d); }
+  getMemberStats(groupId?: number, level?: string, unitId?: number): Observable<any> {
+    const params: any = {};
+    if (groupId != null) params['groupId'] = groupId;
+    if (level) params['level'] = level;
+    if (unitId != null) params['unitId'] = unitId;
+    return this.get('/members/stats', params);
+  }
   importMembers(d: any): Observable<any>                { return this.post('/members/import', d); }
   exportMembersUrl(search: string): string {
     const token = localStorage.getItem('qldt_token') || '';
     return `${this.base}/members/export?search=${search}&token=${token}`;
+  }
+
+  // ─── Units – Quản lý đơn vị ──────────────────────────────────────────────
+  getUnits(p?: any): Observable<any>                    { return this.get('/units', p); }
+  getUnit(id: number): Observable<any>                  { return this.get(`/units/${id}`); }
+  createUnit(d: any): Observable<any>                   { return this.post('/units', d); }
+  updateUnit(id: number, d: any): Observable<any>       { return this.put(`/units/${id}`, d); }
+  deleteUnit(id: number): Observable<any>               { return this.delete(`/units/${id}`); }
+  importUnit(id: number, d: any): Observable<any>       { return this.post(`/units/${id}/import`, d); }
+  importUnitMultiple(id: number, d: any): Observable<any>{ return this.post(`/units/${id}/import-multiple`, d); }
+  deleteUnits(ids: number[]): Observable<any>            { return this.post('/units/delete-multiple', ids); }
+  getUnitSummary(id: number): Observable<any>           { return this.get(`/units/${id}/summary`); }
+  getCombinedSummary(ids: number[]): Observable<any>    { return this.post('/units/combined-summary', ids); }
+  getUnitStats(unitId?: number): Observable<any> {
+    const params: any = {};
+    if (unitId != null) params['unitId'] = unitId;
+    return this.get('/units/stats', params);
+  }
+  exportUnitUrl(id: number): string {
+    const token = localStorage.getItem('qldt_token') || '';
+    return `${this.base}/units/${id}/export?token=${token}`;
+  }
+  exportAllUnitsUrl(): string {
+    const token = localStorage.getItem('qldt_token') || '';
+    return `${this.base}/units/export-all?token=${token}`;
   }
 
   // ─── Audit ────────────────────────────────────────────────────────────────

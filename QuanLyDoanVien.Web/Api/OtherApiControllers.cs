@@ -16,7 +16,7 @@ namespace QuanLyDoanVien.Api
         [HttpGet, Route("")]
         [ApiAuthorize(Permission = "DV_VIEW")]
         public IHttpActionResult GetAll(int page = 1, int pageSize = 20,
-            string search = "", int? groupId = null, bool? isActive = null)
+            string search = "", int? groupId = null, string level = null, int? unitId = null, bool? isActive = null)
         {
             using (var db = new AppDbContext())
             {
@@ -27,6 +27,21 @@ namespace QuanLyDoanVien.Api
                 if (!string.IsNullOrEmpty(search))
                     q = q.Where(m => m.FullName.Contains(search) || m.MemberCode.Contains(search) || m.Phone.Contains(search));
 
+                if (groupId.HasValue)
+                    q = q.Where(m => m.GroupId == groupId.Value);
+
+                if (unitId.HasValue)
+                    q = q.Where(m => m.UnitId == unitId.Value);
+
+                // Lọc theo cấp bậc (qua bảng MemberGroups)
+                if (!string.IsNullOrEmpty(level))
+                {
+                    var groupIds = db.MemberGroups
+                        .Where(g => g.IsActive && g.Level == level)
+                        .Select(g => g.Id).ToList();
+                    q = q.Where(m => m.GroupId.HasValue && groupIds.Contains(m.GroupId.Value));
+                }
+
                 var total = q.Count();
                 var items = q.OrderBy(m => m.FullName)
                     .Skip((page - 1) * pageSize).Take(pageSize)
@@ -35,8 +50,14 @@ namespace QuanLyDoanVien.Api
                         m.Phone, m.Email, m.JoinDate, m.Position, m.IsActive, m.IsUnionMember,
                         m.Ethnicity, m.Religion, m.Profession, m.Education, m.Expertise, m.PoliticalTheory,
                         m.PartyDateProbationary, m.PartyDateOfficial, m.Notes,
+                        groupId = m.GroupId,
+                        unitId = m.UnitId,
                         groupName = db.MemberGroups.Where(g => g.Id == m.GroupId)
-                            .Select(g => g.GroupName).FirstOrDefault()
+                            .Select(g => g.GroupName).FirstOrDefault(),
+                        groupLevel = db.MemberGroups.Where(g => g.Id == m.GroupId)
+                            .Select(g => g.Level).FirstOrDefault(),
+                        unitName = db.Units.Where(u => u.Id == m.UnitId)
+                            .Select(u => u.UnitName).FirstOrDefault()
                     }).ToList();
 
                 return Ok(new { total, page, pageSize, items });
@@ -210,14 +231,14 @@ namespace QuanLyDoanVien.Api
             using (var db = new AppDbContext())
             {
                 var groups = db.MemberGroups.Where(g => g.IsActive)
-                    .Select(g => new { g.Id, g.GroupCode, g.GroupName, g.Description })
+                    .Select(g => new { g.Id, g.GroupCode, g.GroupName, g.Description, g.Level })
                     .ToList();
                 var counts = db.Members.Where(m => m.IsActive && m.GroupId.HasValue)
                     .GroupBy(m => m.GroupId)
                     .Select(g => new { groupId = g.Key, count = g.Count() }).ToList();
 
                 var result = groups.Select(g => new {
-                    g.Id, g.GroupCode, g.GroupName, g.Description,
+                    g.Id, g.GroupCode, g.GroupName, g.Description, g.Level,
                     memberCount = counts.FirstOrDefault(c => c.groupId == g.Id)?.count ?? 0
                 }).ToList();
                 return Ok(result);
@@ -241,22 +262,82 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        [HttpGet, Route("stats")]
-        [ApiAuthorize(Permission = "DV_VIEW")]
-        public IHttpActionResult Stats()
+        [HttpPut, Route("groups/{id:int}")]
+        [ApiAuthorize(Permission = "DV_EDIT")]
+        public IHttpActionResult UpdateGroup(int id, [FromBody] MemberGroup req)
         {
             using (var db = new AppDbContext())
             {
-                var total = db.Members.Count(m => m.IsActive);
-                var byGender = db.Members.Where(m => m.IsActive)
-                    .GroupBy(m => m.Gender)
-                    .Select(g => new { gender = g.Key, count = g.Count() }).ToList();
-                var byGroup = db.Members.Where(m => m.IsActive && m.GroupId.HasValue)
-                    .GroupBy(m => m.GroupId)
-                    .Select(g => new { groupId = g.Key, count = g.Count() }).ToList();
-                return Ok(new { total, byGender, byGroup });
+                var g = db.MemberGroups.Find(id);
+                if (g == null) return NotFound();
+
+                g.GroupName = req.GroupName ?? g.GroupName;
+                g.GroupCode = req.GroupCode ?? g.GroupCode;
+                g.Description = req.Description ?? g.Description;
+                g.Level = req.Level ?? g.Level;
+                db.SaveChanges();
+
+                return Ok(new { success = true, message = "Cập nhật chi đoàn thành công." });
             }
         }
+
+        [HttpGet, Route("stats")]
+        [ApiAuthorize(Permission = "DV_VIEW")]
+        public IHttpActionResult Stats(int? groupId = null, string level = null, int? unitId = null)
+        {
+            using (var db = new AppDbContext())
+            {
+                var q = db.Members.Where(m => m.IsActive);
+                if (groupId.HasValue)
+                    q = q.Where(m => m.GroupId == groupId.Value);
+                if (unitId.HasValue)
+                    q = q.Where(m => m.UnitId == unitId.Value);
+
+                if (!string.IsNullOrEmpty(level))
+                {
+                    var groupIds = db.MemberGroups
+                        .Where(g => g.IsActive && g.Level == level)
+                        .Select(g => g.Id).ToList();
+                    q = q.Where(m => m.GroupId.HasValue && groupIds.Contains(m.GroupId.Value));
+                }
+
+                var total = q.Count();
+                var byGender = q.GroupBy(m => m.Gender)
+                    .Select(g => new { gender = g.Key, count = g.Count() }).ToList();
+
+                var partyCount = q.Count(m => m.PartyDateOfficial != null);
+
+                // Thống kê độ tuổi
+                var today = DateTime.Today;
+                var members = q.Where(m => m.DateOfBirth != null).Select(m => m.DateOfBirth).ToList();
+                int age18to25 = 0, age26to30 = 0, age31plus = 0;
+                foreach (var dob in members)
+                {
+                    int age = today.Year - dob.Value.Year;
+                    if (dob.Value.AddYears(age) > today) age--;
+                    if (age >= 18 && age <= 25) age18to25++;
+                    else if (age >= 26 && age <= 30) age26to30++;
+                    else if (age >= 31) age31plus++;
+                }
+
+                var byGroup = db.Members.Where(m => m.IsActive && m.GroupId.HasValue)
+                    .GroupBy(m => new { m.GroupId })
+                    .Select(g => new { groupId = g.Key.GroupId, count = g.Count() })
+                    .ToList();
+
+                var groups = db.MemberGroups.Where(g => g.IsActive)
+                    .Select(g => new { g.Id, g.GroupName }).ToList();
+
+                var byGroupNamed = byGroup.Select(bg => new {
+                    groupId   = bg.groupId,
+                    count     = bg.count,
+                    groupName = groups.FirstOrDefault(g => g.Id == bg.groupId)?.GroupName ?? "Không rõ"
+                }).ToList();
+
+                return Ok(new { total, byGender, byGroup = byGroupNamed, partyCount, age18to25, age26to30, age31plus });
+            }
+        }
+
 
         [HttpGet, Route("export")]
         [ApiAuthorize(Permission = "DV_VIEW")]
@@ -475,9 +556,7 @@ namespace QuanLyDoanVien.Api
 
                 if (count == 0 && data.Any())
                 {
-                    var firstRow = data.First();
-                    var debugInfo = string.Join(" | ", firstRow.Take(8).Select(kv => $"{kv.Key}: {kv.Value}"));
-                    return Ok(new { success = false, count = 0, message = $"Không tìm thấy dữ liệu hợp lệ. Keys: {debugInfo}" });
+                    return Ok(new { success = false, count = 0, message = "Phát hiện file tải lên trống hoặc toàn bộ dữ liệu (Họ tên, Ngày sinh) đã tồn tại trong hệ thống." });
                 }
 
                 db.SaveChanges();

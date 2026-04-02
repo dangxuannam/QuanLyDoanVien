@@ -70,6 +70,14 @@ export class MainLayoutComponent implements OnInit {
 
   toggleSidebar(): void { this.sidebarOpen = !this.sidebarOpen; }
 
+  /** Kiểm tra menu 'Quản lý đơn vị' đã có trong danh sách dynamic chưa */
+  hasUnitMenuInDynamic(): boolean {
+    return this.menus.some(m =>
+      (m.url || '').replace('#!/', '/').includes('/units') ||
+      (m.menuName || '').toLowerCase().includes('đơn vị')
+    );
+  }
+
   getMaterialIcon(faIcon?: string): string {
     const map: { [k: string]: string } = {
       'fa-tachometer': 'dashboard', 'fa-cogs': 'settings', 'fa-building': 'apartment',
@@ -82,9 +90,10 @@ export class MainLayoutComponent implements OnInit {
       'fa-calculator': 'calculate', 'fa-arrow-down': 'arrow_downward',
       'fa-arrow-up': 'arrow_upward', 'fa-globe': 'public', 'fa-map-pin': 'place',
       'fa-th-list': 'grid_on', 'fa-pencil': 'edit', 'fa-user-plus': 'person_add',
-      'fa-object-group': 'folder_special'
+      'fa-object-group': 'folder_special', 'fa-building-o': 'business',
+      'business': 'business'
     };
-    return map[faIcon || ''] || 'circle';
+    return map[faIcon || ''] || faIcon || 'circle';
   }
 }
 

@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using QuanLyDoanVien.Models.Entities;
 
@@ -26,6 +26,9 @@ namespace QuanLyDoanVien.Models
         // Doan Vien
         public DbSet<MemberGroup> MemberGroups { get; set; }
         public DbSet<Member> Members { get; set; }
+
+        // Don Vi
+        public DbSet<Unit> Units { get; set; }
 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
