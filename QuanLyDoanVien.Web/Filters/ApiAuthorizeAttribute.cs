@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -37,7 +37,7 @@ namespace QuanLyDoanVien.Filters
             if (string.IsNullOrEmpty(token))
             {
                 actionContext.Response = request.CreateErrorResponse(
-                    HttpStatusCode.Unauthorized, "Token khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n.");
+                    HttpStatusCode.Unauthorized, "Token không hợp lệ hoặc đã hết hạn.");
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace QuanLyDoanVien.Filters
                 if (!validation.IsValid)
                 {
                     actionContext.Response = request.CreateErrorResponse(
-                        HttpStatusCode.Unauthorized, "Token khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n.");
+                        HttpStatusCode.Unauthorized, "Token không hợp lệ hoặc đã hết hạn.");
                     return;
                 }
 
@@ -58,7 +58,7 @@ namespace QuanLyDoanVien.Filters
                     if (!validation.Permissions.Contains(Permission))
                     {
                         actionContext.Response = request.CreateErrorResponse(
-                            HttpStatusCode.Forbidden, $"Báº¡n khÃ´ng cÃ³ quyá»n: {Permission}");
+                            HttpStatusCode.Forbidden, $"Bạn không có quyền: {Permission}");
                         return;
                     }
                 }
@@ -84,7 +84,7 @@ namespace QuanLyDoanVien.Filters
             if (!isAdmin)
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
-                    HttpStatusCode.Forbidden, "Chá»‰ quáº£n trá»‹ viÃªn má»›i cÃ³ quyá»n thá»±c hiá»‡n thao tÃ¡c nÃ y.");
+                    HttpStatusCode.Forbidden, "Chỉ quản trị viên mới có quyền thực hiện thao tác này.");
             }
         }
     }

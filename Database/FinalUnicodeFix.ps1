@@ -12,11 +12,11 @@ function Update-Menu($url, $name) {
 
 # Explicitly define names with char codes where needed (Vietnamese characters)
 Update-Menu "/dashboard" "Dashboard"
-Update-Menu "/members" "$([char]0x0110)oÃ n viÃªn"
-Update-Menu "/members/import" "Nháº­p Excel"
-Update-Menu "/users" "NgÆ°á»i dÃ¹ng"
-Update-Menu "/roles" "PhÃ¢n quyá»n"
-Update-Menu "/audit" "Nháº­t kÃ½ hoáº¡t Ä‘á»™ng"
+Update-Menu "/members" "Đoàn Viên"
+Update-Menu "/members/import" "Nhập Excel"
+Update-Menu "/users" "Người Dùng"
+Update-Menu "/roles" "Phân Quyền"
+Update-Menu "/audit" "Nhật Ký Hoạt Động"
 
 $conn.Close()
 Write-Host "Sidebar menus updated with Unicode character support."
