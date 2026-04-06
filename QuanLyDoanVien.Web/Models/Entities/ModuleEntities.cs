@@ -22,20 +22,25 @@ namespace QuanLyDoanVien.Models.Entities
         public int Id { get; set; }
         [Required, MaxLength(50)] public string MemberCode { get; set; }
         [Required, MaxLength(200)] public string FullName { get; set; }
+
         public DateTime? DateOfBirth { get; set; }
         [MaxLength(10)] public string Gender { get; set; }
         [MaxLength(20)] public string Phone { get; set; }
         [MaxLength(200)] public string Email { get; set; }
         [MaxLength(500)] public string Address { get; set; }
+
         public DateTime? JoinDate { get; set; }
         public int? GroupId { get; set; }
         [MaxLength(200)] public string Position { get; set; }
         [MaxLength(50)] public string CardNumber { get; set; }
+
         public bool IsUnionMember { get; set; } = true;
         public bool IsActive { get; set; } = true;
+
         [MaxLength(1000)] public string Notes { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        
         [MaxLength(200)] public string Ethnicity { get; set; }
         [MaxLength(200)] public string Religion { get; set; }
         [MaxLength(500)] public string Profession { get; set; }
