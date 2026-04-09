@@ -12,6 +12,7 @@ export class MemberFormComponent implements OnInit {
   isEdit = false;
   memberId?: number;
   groups: MemberGroup[] = [];
+  units: any[] = [];
 
   // --- Độ tuổi ---
   ageLabel: string = '';
@@ -37,6 +38,7 @@ export class MemberFormComponent implements OnInit {
       dateOfBirth: [null],
       joinDate: [null],
       groupId: [null],
+      unitId: [null],
       gender: [''],
       ethnicity: [''],
       religion: [''],
@@ -60,6 +62,7 @@ export class MemberFormComponent implements OnInit {
     this.isEdit = !!this.memberId;
     if (this.isEdit) this.loadMember();
     this.loadGroups();
+    this.loadUnits();
 
     this.form.get('dateOfBirth')?.valueChanges.subscribe(dob => {
       this.calculateAge(dob);
@@ -94,6 +97,8 @@ export class MemberFormComponent implements OnInit {
   }
 
   loadGroups() { this.api.getMemberGroups().subscribe(g => this.groups = g); }
+
+  loadUnits() { this.api.getUnits({page: 1, pageSize: 200}).subscribe(res => this.units = res.items || []); }
 
   loadMember() {
     if (!this.memberId) return;

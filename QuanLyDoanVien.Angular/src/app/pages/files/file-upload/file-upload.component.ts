@@ -32,6 +32,10 @@ export class FileUploadComponent implements OnInit {
   recentFiles: FileAttachment[] = [];
   loadingFiles = true;
 
+  // Chọn đơn vị khi import đoàn viên
+  units: any[] = [];
+  selectedUnitId: number | null = null;
+
   constructor(
     protected api: ApiService,
     protected router: Router,
@@ -42,6 +46,13 @@ export class FileUploadComponent implements OnInit {
   ngOnInit(): void {
     this.module = this.route.snapshot.data['module'] || 'HE_THONG';
     this.loadFiles();
+    if (this.module === 'DOAN_VIEN') {
+      this.loadUnits();
+    }
+  }
+
+  loadUnits() {
+    this.api.getUnits({ page: 1, pageSize: 500 }).subscribe(r => this.units = r.items || []);
   }
 
   loadFiles() {
@@ -194,7 +205,7 @@ export class FileUploadComponent implements OnInit {
     if (!this.previewFileObj || !this.selectedSheet) return;
     this.uploading = true;
     const fileId = this.previewFileObj.id || this.previewFileObj.Id;
-    const body = { fileId, sheetName: this.selectedSheet.sheetName };
+    const body = { fileId, sheetName: this.selectedSheet.sheetName, unitId: this.selectedUnitId };
     this.api.importMembers(body).subscribe({
       next: (res: any) => {
         this.uploading = false;

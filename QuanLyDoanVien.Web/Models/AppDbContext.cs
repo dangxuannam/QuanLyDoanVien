@@ -30,7 +30,6 @@ namespace QuanLyDoanVien.Models
         // Don Vi
         public DbSet<Unit> Units { get; set; }
 
-
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
@@ -57,4 +56,3 @@ namespace QuanLyDoanVien.Models
         }
     }
 }
-

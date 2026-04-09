@@ -61,7 +61,10 @@ export class ApiService {
   getFiles(p?: any): Observable<PagedResult<FileAttachment>> { return this.get('/files', p); }
   parseExcel(id: number): Observable<ExcelParseResult>      { return this.get(`/files/${id}/parse`); }
   deleteFile(id: number): Observable<any>                   { return this.delete(`/files/${id}`); }
-  downloadUrl(id: number): string                           { return `${this.base}/files/${id}/download`; }
+  downloadUrl(id: number): string { 
+    const token = localStorage.getItem('qldt_token') || '';
+    return `${this.base}/files/${id}/download?token=${token}`; 
+  }
 
   uploadFile(file: File, module?: string, description?: string): Observable<any> {
     const token = localStorage.getItem('qldt_token') || '';

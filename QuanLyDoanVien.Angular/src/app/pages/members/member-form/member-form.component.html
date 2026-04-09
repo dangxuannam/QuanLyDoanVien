@@ -56,6 +56,14 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
+        <mat-label>Đơn vị</mat-label>
+        <mat-select formControlName="unitId">
+          <mat-option [value]="null">-- Không chọn --</mat-option>
+          <mat-option *ngFor="let u of units" [value]="u.id">{{ u.unitName }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
         <mat-label>Chi đoàn</mat-label>
         <mat-select formControlName="groupId">
           <mat-option *ngFor="let g of groups" [value]="g.id">{{ g.groupName }}</mat-option>

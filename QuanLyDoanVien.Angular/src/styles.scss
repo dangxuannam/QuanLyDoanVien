@@ -482,3 +482,159 @@ mat-dialog-actions {
   border-radius: 20px; padding: 6px 14px; font-size: 13px;
   mat-icon { font-size: 18px; }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MOBILE RESPONSIVE — Tối ưu giao diện điện thoại
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Helper: ẩn/hiện theo breakpoint ─────────────────────────────────────────
+// hide-xs: ẩn trên màn hình ≤ 600px
+// show-xs: chỉ hiện trên màn hình ≤ 600px
+.hide-xs { display: inline-flex !important; }
+.show-xs { display: none !important; }
+
+@media (max-width: 600px) {
+  .hide-xs { display: none !important; }
+  .show-xs { display: inline-flex !important; }
+}
+
+// ── Topbar mobile ─────────────────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .topbar-title {
+    font-size: 14px !important;
+    margin-left: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+  }
+  .topbar {
+    padding: 0 4px !important;
+  }
+  .user-button {
+    min-width: 36px !important;
+    padding: 0 4px !important;
+  }
+}
+
+// ── Page content: giảm padding trên mobile ────────────────────────────────────
+@media (max-width: 768px) {
+  .page-content {
+    padding: 12px !important;
+  }
+  .page-header {
+    margin-bottom: 14px;
+  }
+  .page-header h2 {
+    font-size: 18px !important;
+  }
+}
+
+// ── Stat cards: 2 cột → 1 cột ────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .stat-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  .stat-value { font-size: 22px !important; }
+  .stat-icon  { font-size: 28px !important; }
+  .stat-card mat-card-content { padding: 12px !important; gap: 10px !important; }
+}
+@media (max-width: 360px) {
+  .stat-grid { grid-template-columns: 1fr !important; }
+}
+
+// ── Dashboard grid: 2 cột → 1 cột ────────────────────────────────────────────
+@media (max-width: 768px) {
+  .dashboard-grid { grid-template-columns: 1fr !important; }
+}
+
+// ── Filter bar: xếp dọc trên mobile ──────────────────────────────────────────
+@media (max-width: 600px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  .filter-bar .mat-mdc-form-field,
+  .filter-bar mat-form-field,
+  .filter-bar button {
+    width: 100% !important;
+  }
+  .search-field { min-width: 0 !important; }
+}
+
+// ── Tables: cuộn ngang thay vì cắt nội dung ──────────────────────────────────
+@media (max-width: 768px) {
+  .mat-mdc-table-container,
+  .table-container,
+  .mat-elevation-z2 {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  table.mat-mdc-table {
+    min-width: 600px;
+  }
+  // Giảm font size trong bảng
+  table.mat-mdc-table .mat-mdc-cell,
+  table.mat-mdc-table .mat-mdc-header-cell {
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+  }
+}
+
+// ── Side dialog: full width trên mobile ──────────────────────────────────────
+@media (max-width: 600px) {
+  .side-dialog,
+  .side-dialog-wide,
+  .side-dialog-xl {
+    width: 100vw !important;
+    border-radius: 16px 16px 0 0 !important;
+    top: auto !important;
+    bottom: 0;
+    max-height: 85vh;
+  }
+}
+
+// ── Mat Dialog: full screen trên điện thoại ───────────────────────────────────
+@media (max-width: 600px) {
+  .mat-mdc-dialog-container {
+    max-width: 100vw !important;
+    max-height: 90vh !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+  mat-dialog-content {
+    max-height: 60vh !important;
+  }
+}
+
+// ── Form grid: 2 cột → 1 cột ─────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr !important; }
+}
+
+// ── Header actions: xếp dọc ───────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  .header-actions button { width: 100%; }
+}
+
+// ── Mat card: giảm padding ────────────────────────────────────────────────────
+@media (max-width: 600px) {
+  mat-card-content { padding: 12px !important; }
+  mat-card { margin-bottom: 12px; }
+}
+
+// ── Summary grid: 4 cột → 2 cột → 1 cột ─────────────────────────────────────
+@media (max-width: 480px) {
+  .summary-grid { grid-template-columns: 1fr 1fr !important; }
+  .summary-card .sv { font-size: 22px !important; }
+}
+
+// ── Sidebar overlay backdrop: làm tối background khi mở trên mobile ───────────
+.mat-drawer-backdrop.mat-drawer-shown {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+

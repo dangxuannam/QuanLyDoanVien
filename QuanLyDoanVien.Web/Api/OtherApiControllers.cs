@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using QuanLyDoanVien.Filters;
+using QuanLyDoanVien.Helpers;
 using QuanLyDoanVien.Models;
 using QuanLyDoanVien.Models.Entities;
 using QuanLyDoanVien.Services;
+
 
 namespace QuanLyDoanVien.Api
 {
@@ -33,7 +35,6 @@ namespace QuanLyDoanVien.Api
                 if (unitId.HasValue)
                     q = q.Where(m => m.UnitId == unitId.Value);
 
-                // Lọc theo cấp bậc (qua bảng MemberGroups)
                 if (!string.IsNullOrEmpty(level))
                 {
                     var groupIds = db.MemberGroups
@@ -106,6 +107,9 @@ namespace QuanLyDoanVien.Api
                 db.Members.Add(req);
                 db.SaveChanges();
 
+                // Cập nhật thống kê đơn vị ngay lập tức
+                UnitSummaryHelper.RebuildSummary(db, req.UnitId);
+
                 new AuditService(db).Log(req.CreatedBy,
                     Request.Properties["CurrentUsername"]?.ToString(),
                     "CREATE_MEMBER", "DOAN_VIEN", $"Thêm đoàn viên: {req.FullName}");
@@ -144,6 +148,9 @@ namespace QuanLyDoanVien.Api
                 m.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
 
+                // Cập nhật thống kê đơn vị ngay lập tức
+                UnitSummaryHelper.RebuildSummary(db, m.UnitId);
+
                 return Ok(new { success = true, message = "Cập nhật thành công." });
             }
         }
@@ -156,9 +163,14 @@ namespace QuanLyDoanVien.Api
             {
                 var m = db.Members.Find(id);
                 if (m == null) return NotFound();
+                var unitId = m.UnitId;
                 m.IsActive = false;
                 m.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
+
+                // Cập nhật thống kê đơn vị ngay lập tức
+                UnitSummaryHelper.RebuildSummary(db, unitId);
+
                 return Ok(new { success = true, message = "Đã xóa đoàn viên." });
             }
         }
@@ -288,10 +300,8 @@ namespace QuanLyDoanVien.Api
             using (var db = new AppDbContext())
             {
                 var q = db.Members.Where(m => m.IsActive);
-                if (groupId.HasValue)
-                    q = q.Where(m => m.GroupId == groupId.Value);
-                if (unitId.HasValue)
-                    q = q.Where(m => m.UnitId == unitId.Value);
+                if (groupId.HasValue) q = q.Where(m => m.GroupId == groupId.Value);
+                if (unitId.HasValue)  q = q.Where(m => m.UnitId  == unitId.Value);
 
                 if (!string.IsNullOrEmpty(level))
                 {
@@ -301,14 +311,12 @@ namespace QuanLyDoanVien.Api
                     q = q.Where(m => m.GroupId.HasValue && groupIds.Contains(m.GroupId.Value));
                 }
 
-                var total = q.Count();
-                var byGender = q.GroupBy(m => m.Gender)
+                var total      = q.Count();
+                var byGender   = q.GroupBy(m => m.Gender)
                     .Select(g => new { gender = g.Key, count = g.Count() }).ToList();
-
                 var partyCount = q.Count(m => m.PartyDateOfficial != null);
 
-                // Thống kê độ tuổi
-                var today = DateTime.Today;
+                var today   = DateTime.Today;
                 var members = q.Where(m => m.DateOfBirth != null).Select(m => m.DateOfBirth).ToList();
                 int age18to25 = 0, age26to30 = 0, age31plus = 0;
                 foreach (var dob in members)
@@ -322,8 +330,7 @@ namespace QuanLyDoanVien.Api
 
                 var byGroup = db.Members.Where(m => m.IsActive && m.GroupId.HasValue)
                     .GroupBy(m => new { m.GroupId })
-                    .Select(g => new { groupId = g.Key.GroupId, count = g.Count() })
-                    .ToList();
+                    .Select(g => new { groupId = g.Key.GroupId, count = g.Count() }).ToList();
 
                 var groups = db.MemberGroups.Where(g => g.IsActive)
                     .Select(g => new { g.Id, g.GroupName }).ToList();
@@ -547,7 +554,8 @@ namespace QuanLyDoanVien.Api
                         PartyDateProbationary = partyProb,
                         PartyDateOfficial = partyOff,
                         CreatedBy = userId,
-                        CreatedAt = DateTime.Now
+                        CreatedAt = DateTime.Now,
+                        UnitId = req.UnitId
                     };
 
                     db.Members.Add(m);
@@ -563,6 +571,11 @@ namespace QuanLyDoanVien.Api
                 
                 new AuditService(db).Log(userId, username, "IMPORT_MEMBER", "DOAN_VIEN", 
                     $"Import thành công {count} đoàn viên từ file: {attachment.OriginalName} (ID: {attachment.Id})");
+
+                if (req.UnitId.HasValue)
+                {
+                    QuanLyDoanVien.Helpers.UnitSummaryHelper.RebuildSummary(db, req.UnitId.Value);
+                }
 
                 return Ok(new { success = true, count, message = $"Đã import thành công {count} bản ghi." });
             }
@@ -626,6 +639,7 @@ namespace QuanLyDoanVien.Api
     {
         public int FileId { get; set; }
         public string SheetName { get; set; }
+        public int? UnitId { get; set; }
     }
 
     [RoutePrefix("api/audit")]

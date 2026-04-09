@@ -144,11 +144,22 @@
 
 <!-- EXCEL PREVIEW -->
 <mat-card *ngIf="previewResult || previewLoading" style="margin-top:20px">
-  <mat-card-header>
+  <mat-card-header style="align-items: center; gap: 16px;">
     <mat-icon mat-card-avatar>table_chart</mat-icon>
-    <mat-card-title>Xem trước: {{ previewFileObj?.originalName || previewFileObj?.OriginalName }}</mat-card-title>
-    <mat-card-subtitle>{{ previewResult?.sheetCount }} sheet</mat-card-subtitle>
+    <div>
+      <mat-card-title>Xem trước: {{ previewFileObj?.originalName || previewFileObj?.OriginalName }}</mat-card-title>
+      <mat-card-subtitle>{{ previewResult?.sheetCount }} sheet</mat-card-subtitle>
+    </div>
     <span class="spacer"></span>
+    
+    <mat-form-field appearance="outline" *ngIf="module === 'DOAN_VIEN'" style="width: 250px; margin-bottom: -1.25em;">
+      <mat-label>Chọn đơn vị (Tùy chọn)</mat-label>
+      <mat-select [(ngModel)]="selectedUnitId">
+        <mat-option [value]="null">-- Không chọn --</mat-option>
+        <mat-option *ngFor="let u of units" [value]="u.id">{{ u.unitName }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <button mat-raised-button color="accent" (click)="importMembers()" [disabled]="uploading || !selectedSheet">
       <mat-icon>save_alt</mat-icon> Import dữ liệu vào Đoàn viên
     </button>

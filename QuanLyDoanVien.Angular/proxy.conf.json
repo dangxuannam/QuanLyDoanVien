@@ -9,5 +9,10 @@
     "target": "http://localhost:52369",
     "secure": false,
     "changeOrigin": true
+  },
+  "/profiler": {
+    "target": "http://localhost:52369",
+    "secure": false,
+    "changeOrigin": true
   }
 }

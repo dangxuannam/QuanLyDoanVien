@@ -291,7 +291,17 @@
             <mat-label>Mô tả</mat-label>
             <textarea matInput [(ngModel)]="formData.description" rows="2"></textarea>
           </mat-form-field>
-          <div class="file-upload-zone">
+          <div style="margin-bottom: 24px;">
+            <p style="margin-top: 0;"><strong>Tải lên file mới hoặc chọn file đã có:</strong></p>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Chọn file tải lên trước đó (Tùy chọn)</mat-label>
+              <mat-select [(ngModel)]="existingFileId">
+                <mat-option [value]="null">-- Tải lên file mới bên dưới --</mat-option>
+                <mat-option *ngFor="let f of files" [value]="f.id">{{ f.originalName }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="file-upload-zone" *ngIf="!existingFileId">
             <mat-icon class="upload-icon">upload_file</mat-icon>
             <p>Chọn file Excel của đơn vị</p>
             <input type="file" accept=".xlsx,.xls" (change)="onFileSelected($event)" #fileInput style="display:none">

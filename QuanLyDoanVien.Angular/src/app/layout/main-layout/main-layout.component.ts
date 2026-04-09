@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
@@ -10,11 +10,16 @@ import { MenuItem } from '../../core/models/models';
   templateUrl: './main-layout.component.html'
 })
 export class MainLayoutComponent implements OnInit {
-  sidebarOpen = true;
+  // Sidebar mặc định đóng trên màn hình nhỏ, mở trên desktop
+  sidebarOpen = window.innerWidth > 768;
+  isMobile    = window.innerWidth <= 768;
   menus: MenuItem[] = [];
   rootMenus: MenuItem[] = [];
   childMenus: { [key: number]: MenuItem[] } = {};
   user = this.authService.getUser();
+
+  // 'over' trên mobile (hiện đè lên nội dung), 'side' trên desktop (y mode)
+  get sidebarMode(): 'over' | 'side' { return this.isMobile ? 'over' : 'side'; }
 
   constructor(
     public authService: AuthService,
@@ -22,10 +27,18 @@ export class MainLayoutComponent implements OnInit {
     private router: Router
   ) {}
 
+  // Cập nhật khi người dùng xoay màn hình / resize
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.isMobile   = window.innerWidth <= 768;
+    this.sidebarOpen = window.innerWidth > 768;
+  }
+
   ngOnInit(): void {
     this.loadMenus();
+    // Tự đóng sidebar khi navigate trên mobile
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
-      if (window.innerWidth < 768) this.sidebarOpen = false;
+      if (this.isMobile) this.sidebarOpen = false;
     });
   }
 

@@ -42,6 +42,7 @@ export class UnitListComponent implements OnInit, OnDestroy {
   createTabIndex = 0;
   inlineFile: File | null = null;
   inlineUploading = false;
+  existingFileId: number | null = null;
 
   /* ── Upload / Import ─────────────────────────────────────────────────── */
   files: any[]     = [];
@@ -171,6 +172,7 @@ export class UnitListComponent implements OnInit, OnDestroy {
     this.editMode = false; this.editingId = null;
     this.formData = { unitName: '', description: '' };
     this.createTab = 'manual'; this.inlineFile = null; this.importResult = null;
+    this.existingFileId = null;
     if (!this.filesLoaded) this.loadFiles();
     this.dlgRef = this.dialog.open(this.formTpl, { width: '540px', maxHeight: '90vh', panelClass: 'unit-mat-dialog' });
   }
@@ -193,21 +195,35 @@ export class UnitListComponent implements OnInit, OnDestroy {
       this.api.createUnit(this.formData).subscribe({
         next: (r) => {
           const newId = r.id;
-          if (this.createTab === 'file' && this.inlineFile) {
-            this.inlineUploading = true;
-            this.api.uploadFile(this.inlineFile, 'DON_VI').subscribe({
-              next: (fRes) => {
-                const fileId = fRes.file?.id || fRes.file?.Id || fRes.id;
-                this.api.importUnit(newId, { fileId, sheetName: this.sheetName }).subscribe({
-                  next: (iRes) => {
-                    this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load();
-                    this.snack.open(`Đã tạo và tổng hợp ${iRes.count} bản ghi.`, 'Đóng', { duration: 4000 });
-                  },
-                  error: () => { this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load(); this.snack.open('Tạo thành công, import lỗi.', 'Đóng', { duration: 4000 }); }
-                });
-              },
-              error: () => { this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load(); this.snack.open('Tạo thành công, upload lỗi.', 'Đóng', { duration: 4000 }); }
-            });
+          if (this.createTab === 'file') {
+            if (this.existingFileId) {
+              this.inlineUploading = true;
+              this.api.importUnit(newId, { fileId: this.existingFileId, sheetName: this.sheetName }).subscribe({
+                next: (iRes) => {
+                  this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load();
+                  this.snack.open(`Đã tạo và tổng hợp ${iRes.count} bản ghi.`, 'Đóng', { duration: 4000 });
+                },
+                error: () => { this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load(); this.snack.open('Tạo thành công, import lỗi.', 'Đóng', { duration: 4000 }); }
+              });
+            } else if (this.inlineFile) {
+              this.inlineUploading = true;
+              this.api.uploadFile(this.inlineFile, 'DON_VI').subscribe({
+                next: (fRes) => {
+                  const fileId = fRes.file?.id || fRes.file?.Id || fRes.id;
+                  this.api.importUnit(newId, { fileId, sheetName: this.sheetName }).subscribe({
+                    next: (iRes) => {
+                      this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load();
+                      this.snack.open(`Đã tạo và tổng hợp ${iRes.count} bản ghi.`, 'Đóng', { duration: 4000 });
+                    },
+                    error: () => { this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load(); this.snack.open('Tạo thành công, import lỗi.', 'Đóng', { duration: 4000 }); }
+                  });
+                },
+                error: () => { this.saving = false; this.inlineUploading = false; this.dlgRef?.close(); this.load(); this.snack.open('Tạo thành công, upload lỗi.', 'Đóng', { duration: 4000 }); }
+              });
+            } else {
+              this.saving = false; this.dlgRef?.close(); this.load();
+              this.snack.open('Đã thêm đơn vị mới.', 'Đóng', { duration: 3000 });
+            }
           } else {
             this.saving = false; this.dlgRef?.close(); this.load();
             this.snack.open('Đã thêm đơn vị mới.', 'Đóng', { duration: 3000 });
