@@ -451,9 +451,23 @@ namespace QuanLyDoanVien.Api
         {
             var result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (var d in dicts)
+            {
                 foreach (var kv in d)
-                    result[kv.Key] = result.ContainsKey(kv.Key) ? result[kv.Key] + kv.Value : kv.Value;
+                {
+                    string key = NormalizeKey(kv.Key);
+                    result[key] = result.ContainsKey(key) ? result[key] + kv.Value : kv.Value;
+                }
+            }
             return result;
+        }
+
+        private static string NormalizeKey(string key)
+        {
+            if (string.IsNullOrEmpty(key)) return key;
+            key = key.Trim().Normalize(System.Text.NormalizationForm.FormC);
+            if (key.Length > 0)
+                key = char.ToUpper(key[0]) + key.Substring(1).ToLower();
+            return key;
         }
 
         // ─── XUẤT EXCEL MỘT ĐƠN VỊ ──────────────────────────────────────────
@@ -957,7 +971,7 @@ namespace QuanLyDoanVien.Api
         private void IncrementDict(Dictionary<string, int> dict, string key)
         {
             if (string.IsNullOrEmpty(key)) return;
-            key = key.Trim();
+            key = NormalizeKey(key);
             if (dict.ContainsKey(key)) dict[key]++;
             else dict[key] = 1;
         }
