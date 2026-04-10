@@ -232,7 +232,7 @@ namespace QuanLyDoanVien.Services
                                     if (!dict.ContainsKey(parentName) || string.IsNullOrEmpty(dict[parentName]) || IsChecked(dict[parentName]))
                                     {
                                         dict[parentName] = cellVal;                                      
-                                        dict[parentName + "_gender"] = colSubs[c]; // "Nam" or "Nữ"
+                                        dict[parentName + "_gender"] = colSubs[c]; 
                                     }
                                 }
                             }

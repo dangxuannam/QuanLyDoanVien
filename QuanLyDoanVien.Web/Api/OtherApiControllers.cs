@@ -107,7 +107,6 @@ namespace QuanLyDoanVien.Api
                 db.Members.Add(req);
                 db.SaveChanges();
 
-                // Cập nhật thống kê đơn vị ngay lập tức
                 UnitSummaryHelper.RebuildSummary(db, req.UnitId);
 
                 new AuditService(db).Log(req.CreatedBy,
@@ -138,7 +137,6 @@ namespace QuanLyDoanVien.Api
                 m.IsActive = req.IsActive;
                 m.IsUnionMember = req.IsUnionMember;
                 m.Notes = req.Notes ?? m.Notes;
-                // Bổ sung các trường mới
                 m.Ethnicity = req.Ethnicity ?? m.Ethnicity;
                 m.Religion = req.Religion ?? m.Religion;
                 m.Profession = req.Profession ?? m.Profession;
@@ -148,7 +146,6 @@ namespace QuanLyDoanVien.Api
                 m.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
 
-                // Cập nhật thống kê đơn vị ngay lập tức
                 UnitSummaryHelper.RebuildSummary(db, m.UnitId);
 
                 return Ok(new { success = true, message = "Cập nhật thành công." });
@@ -461,7 +458,6 @@ namespace QuanLyDoanVien.Api
                                    (!string.IsNullOrEmpty(dobNuStr) ? dobNuStr : dobChungStr);
                     var dob = ParseDate(dobStr);
 
-                    // ── Giới tính 
                     string gender = "";
                     if (!string.IsNullOrEmpty(dobNamStr) && ParseDate(dobNamStr) != null) gender = "Nam";
                     else if (!string.IsNullOrEmpty(dobNuStr) && ParseDate(dobNuStr) != null) gender = "Nữ";
@@ -470,17 +466,14 @@ namespace QuanLyDoanVien.Api
               
                     if (existing.Any(e => e.FullName == fullName && e.DateOfBirth == dob)) continue;
 
-                    // ── Dân tộc
                     string ethnicity = GetValue(row, "Dân tộc", "Ethnic");
                     if (string.IsNullOrEmpty(ethnicity) || IsCheckedMark(ethnicity))
                         ethnicity = "Kinh"; // default khi không resolve được
 
-                    // ── Tôn giáo 
                     string religion = GetValue(row, "Tôn giáo");
                     if (string.IsNullOrEmpty(religion) || IsCheckedMark(religion))
                         religion = "Không";
 
-                    // ── Nghề nghiệp, Học vấn, Chuyên môn, LLCT (checkbox → sub-tên) ──
                     string profession = GetValue(row, "Nghề nghiệp");
                     if (IsCheckedMark(profession)) profession = "";
 
@@ -493,7 +486,6 @@ namespace QuanLyDoanVien.Api
                     string politicalTheory = GetValue(row, "Lý luận chính trị");
                     if (IsCheckedMark(politicalTheory)) politicalTheory = "";
 
-                    // ── Đảng viên: ngày kết nạp 
                     var partyProb = ParseDate(GetValue(row,
                         "Đoàn viên là đảng viên - Ngày kết nạp dự bị",
                         "Ngày kết nạp dự bị", "Dự bị"));
@@ -501,7 +493,6 @@ namespace QuanLyDoanVien.Api
                         "Đoàn viên là đảng viên - Ngày kết nạp chính thức",
                         "Ngày kết nạp chính thức", "Chính thức"));
 
-                    // ── Cấp ủy  
                     var notesList = new System.Collections.Generic.List<string>();
                     if (IsCheckedMark(GetValue(row, "Tham gia cấp ủy cấp trên cơ sở")))
                         notesList.Add("Tham gia cấp ủy cấp trên cơ sở");
@@ -509,7 +500,6 @@ namespace QuanLyDoanVien.Api
                         notesList.Add("Tham gia cấp ủy cơ sở");
                     string notes = string.Join(", ", notesList);
 
-                    // ── Chức vụ 
                     var posList = new System.Collections.Generic.List<string>();
                     if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Ban chấp hành"))) posList.Add("Ban chấp hành");
                     if (IsCheckedMark(GetValue(row, "Số đoàn viên đảm nhiệm các chức vụ chủ chốt - Ban thường vụ"))) posList.Add("Ban thường vụ");
@@ -522,7 +512,6 @@ namespace QuanLyDoanVien.Api
                     if (string.IsNullOrEmpty(position))
                         position = GetValue(row, "Chức vụ", "Position");
 
-                    // ── Phân loại 
                     bool isUnionMember = true; 
                     string phanLoai = GetValue(row, "Phân loại", "Loại");
                     if (!string.IsNullOrEmpty(phanLoai))

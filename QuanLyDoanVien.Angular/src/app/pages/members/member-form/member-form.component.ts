@@ -98,7 +98,7 @@ export class MemberFormComponent implements OnInit {
 
   loadGroups() { this.api.getMemberGroups().subscribe(g => this.groups = g); }
 
-  loadUnits() { this.api.getUnits({page: 1, pageSize: 200}).subscribe(res => this.units = res.items || []); }
+  loadUnits() { this.api.getUnits({ page: 1, pageSize: 200 }).subscribe(res => this.units = res.items || []); }
 
   loadMember() {
     if (!this.memberId) return;

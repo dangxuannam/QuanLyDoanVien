@@ -10,33 +10,29 @@ import { MenuItem } from '../../core/models/models';
   templateUrl: './main-layout.component.html'
 })
 export class MainLayoutComponent implements OnInit {
-  // Sidebar mặc định đóng trên màn hình nhỏ, mở trên desktop
   sidebarOpen = window.innerWidth > 768;
-  isMobile    = window.innerWidth <= 768;
+  isMobile = window.innerWidth <= 768;
   menus: MenuItem[] = [];
   rootMenus: MenuItem[] = [];
   childMenus: { [key: number]: MenuItem[] } = {};
   user = this.authService.getUser();
 
-  // 'over' trên mobile (hiện đè lên nội dung), 'side' trên desktop (y mode)
   get sidebarMode(): 'over' | 'side' { return this.isMobile ? 'over' : 'side'; }
 
   constructor(
     public authService: AuthService,
     private apiService: ApiService,
     private router: Router
-  ) {}
+  ) { }
 
-  // Cập nhật khi người dùng xoay màn hình / resize
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.isMobile   = window.innerWidth <= 768;
+    this.isMobile = window.innerWidth <= 768;
     this.sidebarOpen = window.innerWidth > 768;
   }
 
   ngOnInit(): void {
     this.loadMenus();
-    // Tự đóng sidebar khi navigate trên mobile
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
       if (this.isMobile) this.sidebarOpen = false;
     });
@@ -54,7 +50,7 @@ export class MainLayoutComponent implements OnInit {
         });
         this.childMenus = children;
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -83,7 +79,6 @@ export class MainLayoutComponent implements OnInit {
 
   toggleSidebar(): void { this.sidebarOpen = !this.sidebarOpen; }
 
-  /** Kiểm tra menu 'Quản lý đơn vị' đã có trong danh sách dynamic chưa */
   hasUnitMenuInDynamic(): boolean {
     return this.menus.some(m =>
       (m.url || '').replace('#!/', '/').includes('/units') ||

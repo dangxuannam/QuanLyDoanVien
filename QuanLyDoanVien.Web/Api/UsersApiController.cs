@@ -69,11 +69,11 @@ namespace QuanLyDoanVien.Api
 
             using (var db = new AppDbContext())
             {
-                // Kiá»ƒm tra user cÃ¹ng tÃªn Ä'ang HOáº T Ä á»˜NG
+
                 if (db.Users.Any(u => u.Username == req.Username && u.IsActive))
                     return BadRequest("Tên đăng nhập đã tồn tại.");
 
-                // Náº¿u user Ä'Ã£ tá»“n táº¡i nhÆ°ng bá»‹ vÃ´ hiá»‡u hÃ³a â†' kÃ­ch hoáº¡t láº¡i
+             
                 var existingInactive = db.Users.FirstOrDefault(u => u.Username == req.Username && !u.IsActive);
                 if (existingInactive != null)
                 {

@@ -3,7 +3,6 @@
 </div>
 
 <div class="upload-grid">
-  <!-- LEFT: Upload area -->
   <div>
     <mat-card>
       <mat-card-header>
@@ -13,18 +12,15 @@
       </mat-card-header>
       <mat-card-content>
 
-        <!-- Drop zone -->
-        <div class="upload-zone" [class.drag-over]="dragOver"
-             (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)"
-             (click)="fileInput.click()">
+        <div class="upload-zone" [class.drag-over]="dragOver" (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()" (drop)="onDrop($event)" (click)="fileInput.click()">
           <input #fileInput type="file" accept=".xlsx,.xls" multiple style="display:none"
-                 (change)="onFileSelect($event)">
+            (change)="onFileSelect($event)">
           <mat-icon class="upload-icon">cloud_upload</mat-icon>
           <h3>Kéo thả nhiều file vào đây</h3>
           <p>hoặc nhấn để chọn file .xlsx, .xls (cho phép chọn nhiều)</p>
         </div>
 
-        <!-- File Queue -->
         <div *ngIf="hasQueue" class="file-queue">
           <div class="queue-header">
             <span><mat-icon style="font-size:16px;vertical-align:middle">queue</mat-icon>
@@ -38,9 +34,8 @@
 
           <div class="queue-list">
             <div *ngFor="let qf of fileQueue; let i = index" class="queue-item"
-                 [class.status-done]="qf.status === 'done'"
-                 [class.status-error]="qf.status === 'error'"
-                 [class.status-uploading]="qf.status === 'uploading'">
+              [class.status-done]="qf.status === 'done'" [class.status-error]="qf.status === 'error'"
+              [class.status-uploading]="qf.status === 'uploading'">
 
               <mat-icon class="file-icon">table_view</mat-icon>
 
@@ -48,9 +43,8 @@
                 <span class="file-name">{{ qf.file.name }}</span>
                 <span class="file-size">{{ formatSize(qf.file.size) }}</span>
 
-                <!-- Progress bar khi đang upload -->
-                <mat-progress-bar *ngIf="qf.status === 'uploading'"
-                  mode="determinate" [value]="qf.progress" class="file-progress">
+                <mat-progress-bar *ngIf="qf.status === 'uploading'" mode="determinate" [value]="qf.progress"
+                  class="file-progress">
                 </mat-progress-bar>
 
                 <span *ngIf="qf.status === 'error'" class="error-text">
@@ -65,37 +59,32 @@
                 <mat-icon *ngIf="qf.status === 'done'" class="status-icon done">check_circle</mat-icon>
                 <mat-icon *ngIf="qf.status === 'error'" class="status-icon error">cancel</mat-icon>
 
-                <!-- Nút xem preview (nếu đã done và có excel) -->
                 <button *ngIf="qf.status === 'done' && qf.result?.excelData" mat-icon-button color="primary"
                   (click)="previewQueued(qf)" matTooltip="Xem trước & Import">
                   <mat-icon>preview</mat-icon>
                 </button>
 
-                <!-- Nút xóa khỏi hàng chờ -->
-                <button *ngIf="qf.status !== 'uploading'" mat-icon-button color="warn"
-                  (click)="removeFromQueue(i)" matTooltip="Xóa khỏi hàng chờ">
+                <button *ngIf="qf.status !== 'uploading'" mat-icon-button color="warn" (click)="removeFromQueue(i)"
+                  matTooltip="Xóa khỏi hàng chờ">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Overall progress -->
           <div *ngIf="uploading" class="overall-progress">
             <span>Đang upload... {{ uploadProgress }}%</span>
             <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
           </div>
 
-          <!-- Upload button -->
-          <button mat-raised-button color="primary" class="full-width upload-btn"
-            (click)="uploadAll()" [disabled]="uploading || pendingCount === 0">
+          <button mat-raised-button color="primary" class="full-width upload-btn" (click)="uploadAll()"
+            [disabled]="uploading || pendingCount === 0">
             <mat-spinner *ngIf="uploading" diameter="20" style="display:inline-block;margin-right:8px"></mat-spinner>
             <mat-icon *ngIf="!uploading">cloud_upload</mat-icon>
             {{ uploading ? 'Đang upload...' : 'Upload ' + pendingCount + ' file' }}
           </button>
         </div>
 
-        <!-- No queue - placeholder -->
         <div *ngIf="!hasQueue" class="empty-queue">
           <mat-icon>inventory_2</mat-icon>
           <p>Chưa có file nào trong hàng chờ. Hãy chọn hoặc kéo thả file Excel vào vùng trên.</p>
@@ -105,7 +94,6 @@
     </mat-card>
   </div>
 
-  <!-- RIGHT: Recent files -->
   <div>
     <mat-card>
       <mat-card-header>
@@ -142,7 +130,6 @@
   </div>
 </div>
 
-<!-- EXCEL PREVIEW -->
 <mat-card *ngIf="previewResult || previewLoading" style="margin-top:20px">
   <mat-card-header style="align-items: center; gap: 16px;">
     <mat-icon mat-card-avatar>table_chart</mat-icon>
@@ -151,7 +138,7 @@
       <mat-card-subtitle>{{ previewResult?.sheetCount }} sheet</mat-card-subtitle>
     </div>
     <span class="spacer"></span>
-    
+
     <mat-form-field appearance="outline" *ngIf="module === 'DOAN_VIEN'" style="width: 250px; margin-bottom: -1.25em;">
       <mat-label>Chọn đơn vị (Tùy chọn)</mat-label>
       <mat-select [(ngModel)]="selectedUnitId">
@@ -168,22 +155,21 @@
     <mat-spinner *ngIf="previewLoading" diameter="40" style="margin:24px auto;display:block"></mat-spinner>
 
     <ng-container *ngIf="previewResult && !previewLoading">
-      <!-- Sheet tabs -->
       <div class="sheet-tabs">
-        <div *ngFor="let s of previewResult.sheets"
-             class="sheet-tab" [class.active]="selectedSheet === s"
-             (click)="selectSheet(s)">
+        <div *ngFor="let s of previewResult.sheets" class="sheet-tab" [class.active]="selectedSheet === s"
+          (click)="selectSheet(s)">
           <mat-icon style="font-size:16px;vertical-align:middle">table_view</mat-icon>
           {{ s.sheetName }}
           <span style="margin-left:6px;font-size:10px;opacity:.7">{{ s.totalRows }} dòng</span>
         </div>
       </div>
 
-      <!-- Table -->
       <div *ngIf="selectedSheet" class="excel-wrap">
         <table class="excel-table" *ngIf="!selectedSheet.isEmpty">
           <thead>
-            <tr><th *ngFor="let h of selectedSheet.headers">{{ h }}</th></tr>
+            <tr>
+              <th *ngFor="let h of selectedSheet.headers">{{ h }}</th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let row of selectedSheet.rows">
@@ -202,62 +188,204 @@
 </mat-card>
 
 <style>
-.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media(max-width:768px) { .upload-grid { grid-template-columns: 1fr; } }
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
 
-.upload-zone {
-  border: 2px dashed #90a4ae; border-radius: 12px; padding: 28px 20px;
-  text-align: center; cursor: pointer; transition: all .2s;
-  background: #f8fafb;
-}
-.upload-zone:hover, .upload-zone.drag-over {
-  border-color: #3f51b5; background: #e8eaf6;
-}
-.upload-zone .upload-icon { font-size: 48px; color: #90a4ae; display:block; margin-bottom:8px; }
-.upload-zone h3 { margin: 0 0 4px; color: #37474f; font-size: 15px; }
-.upload-zone p  { margin: 0; font-size: 12px; color: #78909c; }
+  @media(max-width:768px) {
+    .upload-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 
-/* Queue */
-.file-queue { margin-top: 16px; }
-.queue-header {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 13px; font-weight: 600; color: #546e7a; margin-bottom: 8px;
-}
-.badge-done {
-  background: #e8f5e9; color: #2e7d32; border-radius:10px;
-  padding: 2px 8px; font-size: 11px; margin-left: 8px;
-}
+  .upload-zone {
+    border: 2px dashed #90a4ae;
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    background: #f8fafb;
+  }
 
-.queue-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
-.queue-item {
-  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-  border-radius: 8px; border: 1px solid #eceff1; background: #fff;
-  transition: background .2s;
-}
-.queue-item.status-done     { border-color: #c8e6c9; background: #f1f8e9; }
-.queue-item.status-error    { border-color: #ffccbc; background: #fff3e0; }
-.queue-item.status-uploading{ border-color: #bbdefb; background: #e3f2fd; }
+  .upload-zone:hover,
+  .upload-zone.drag-over {
+    border-color: #3f51b5;
+    background: #e8eaf6;
+  }
 
-.file-icon { color: #42a5f5; font-size: 24px; flex-shrink: 0; }
-.file-info { flex: 1; min-width: 0; }
-.file-name { display: block; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.file-size { font-size: 11px; color: #90a4ae; }
-.file-progress { margin-top: 4px; }
-.error-text { font-size: 11px; color: #e53935; display: block; margin-top: 2px; }
-.file-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+  .upload-zone .upload-icon {
+    font-size: 48px;
+    color: #90a4ae;
+    display: block;
+    margin-bottom: 8px;
+  }
 
-.status-icon { font-size: 20px; }
-.status-icon.pending   { color: #bdbdbd; }
-.status-icon.done      { color: #43a047; }
-.status-icon.error     { color: #e53935; }
+  .upload-zone h3 {
+    margin: 0 0 4px;
+    color: #37474f;
+    font-size: 15px;
+  }
 
-.overall-progress { margin: 12px 0; }
-.overall-progress span { font-size: 12px; color: #546e7a; display: block; margin-bottom: 4px; }
+  .upload-zone p {
+    margin: 0;
+    font-size: 12px;
+    color: #78909c;
+  }
 
-.upload-btn { margin-top: 12px; height: 44px; font-size: 14px; }
-.full-width { width: 100%; }
+  .file-queue {
+    margin-top: 16px;
+  }
 
-.empty-queue { text-align: center; padding: 24px 16px; color: #90a4ae; }
-.empty-queue mat-icon { font-size: 40px; display:block; margin-bottom: 8px; }
-.empty-queue p { margin: 0; font-size: 13px; }
+  .queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #546e7a;
+    margin-bottom: 8px;
+  }
+
+  .badge-done {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 11px;
+    margin-left: 8px;
+  }
+
+  .queue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #eceff1;
+    background: #fff;
+    transition: background .2s;
+  }
+
+  .queue-item.status-done {
+    border-color: #c8e6c9;
+    background: #f1f8e9;
+  }
+
+  .queue-item.status-error {
+    border-color: #ffccbc;
+    background: #fff3e0;
+  }
+
+  .queue-item.status-uploading {
+    border-color: #bbdefb;
+    background: #e3f2fd;
+  }
+
+  .file-icon {
+    color: #42a5f5;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .file-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .file-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-size {
+    font-size: 11px;
+    color: #90a4ae;
+  }
+
+  .file-progress {
+    margin-top: 4px;
+  }
+
+  .error-text {
+    font-size: 11px;
+    color: #e53935;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .file-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .status-icon {
+    font-size: 20px;
+  }
+
+  .status-icon.pending {
+    color: #bdbdbd;
+  }
+
+  .status-icon.done {
+    color: #43a047;
+  }
+
+  .status-icon.error {
+    color: #e53935;
+  }
+
+  .overall-progress {
+    margin: 12px 0;
+  }
+
+  .overall-progress span {
+    font-size: 12px;
+    color: #546e7a;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .upload-btn {
+    margin-top: 12px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .empty-queue {
+    text-align: center;
+    padding: 24px 16px;
+    color: #90a4ae;
+  }
+
+  .empty-queue mat-icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .empty-queue p {
+    margin: 0;
+    font-size: 13px;
+  }
 </style>

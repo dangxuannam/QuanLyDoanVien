@@ -13,11 +13,6 @@ namespace QuanLyDoanVien
     {
         protected void Application_Start()
         {
-            // ============================================================
-            // CUSTOM PROFILER - Đăng ký EF Interceptor để đo SQL queries
-            // Sử dụng System.Data.Entity.Infrastructure.Interception (built-in EF6)
-            // KHÔNG cần bất kỳ NuGet package bên ngoài nào
-            // ============================================================
             System.Data.Entity.Infrastructure.Interception.DbInterception.Add(
                 new EfTimingInterceptor()
             );

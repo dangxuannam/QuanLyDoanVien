@@ -12,22 +12,22 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 export class MemberListComponent implements OnInit, OnDestroy {
   members: Member[] = [];
   selection = new SelectionModel<Member>(true, []);
-  total     = 0;
-  page      = 1;
-  pageSize  = 15;
-  search    = '';
-  loading   = false;
+  total = 0;
+  page = 1;
+  pageSize = 15;
+  search = '';
+  loading = false;
 
   /* ── RxJS: debounce search ──────────────────────────────────────────── */
   private searchSubject = new Subject<string>();
-  private destroy$      = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
   /* ── Bộ lọc ──────────────────────────────────────────────────────── */
-  groups: MemberGroup[]     = [];
-  units: any[]              = [];
+  groups: MemberGroup[] = [];
+  units: any[] = [];
   selectedGroupId: number | null = null;
-  selectedLevel: string | null   = null;
-  selectedUnitId: number | null  = null;
+  selectedLevel: string | null = null;
+  selectedUnitId: number | null = null;
 
   readonly LEVELS = ['Trung ương', 'Tỉnh', 'Thành phố', 'Huyện', 'Xã / Phường', 'Cơ sở'];
 
@@ -37,7 +37,7 @@ export class MemberListComponent implements OnInit, OnDestroy {
     'politicalTheory', 'partyProb', 'partyOff', 'position', 'cardNumber', 'actions'
   ];
 
-  constructor(private api: ApiService, private router: Router, private snack: MatSnackBar) {}
+  constructor(private api: ApiService, private router: Router, private snack: MatSnackBar) { }
 
   ngOnInit() {
     // Debounce 400ms: tự động tìm kiếm khi ngừng gõ hoặc xóa trắng
@@ -55,11 +55,11 @@ export class MemberListComponent implements OnInit, OnDestroy {
   ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
 
   loadGroups() {
-    this.api.getMemberGroups().subscribe({ next: r => this.groups = r, error: () => {} });
+    this.api.getMemberGroups().subscribe({ next: r => this.groups = r, error: () => { } });
   }
 
   loadUnits() {
-    this.api.getUnits({ page: 1, pageSize: 200 }).subscribe({ next: r => this.units = r.items || [], error: () => {} });
+    this.api.getUnits({ page: 1, pageSize: 200 }).subscribe({ next: r => this.units = r.items || [], error: () => { } });
   }
 
   load() {
@@ -67,25 +67,22 @@ export class MemberListComponent implements OnInit, OnDestroy {
     this.api.getMembers(
       this.page, this.pageSize, this.search,
       this.selectedGroupId ?? undefined,
-      this.selectedLevel   ?? undefined,
-      this.selectedUnitId  ?? undefined
+      this.selectedLevel ?? undefined,
+      this.selectedUnitId ?? undefined
     ).subscribe({
       next: (res) => { this.members = res.items; this.total = res.total; this.loading = false; },
       error: () => this.loading = false
     });
   }
 
-  /* Gọi mỗi khi người dùng gõ/xóa ký tự trong ô tìm kiếm */
   onSearchInput() { this.searchSubject.next(this.search); }
 
-  /* Xóa nhanh và reload ngay */
   clearSearch() { this.search = ''; this.page = 1; this.load(); }
 
-  /* Vẫn giữ tìm kiếm khi nhấn Enter ngay lập tức (không đợi debounce) */
   searchMembers() { this.page = 1; this.load(); }
 
   onGroupChange() { this.page = 1; this.load(); }
-  onUnitChange()  { this.page = 1; this.load(); }
+  onUnitChange() { this.page = 1; this.load(); }
   onLevelChange() { this.selectedGroupId = null; this.page = 1; this.load(); }
 
   get filteredGroups(): MemberGroup[] {
@@ -104,12 +101,12 @@ export class MemberListComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: PageEvent) {
-    this.page     = event.pageIndex + 1;
+    this.page = event.pageIndex + 1;
     this.pageSize = event.pageSize;
     this.load();
   }
 
-  create()       { this.router.navigate(['/members/create']); }
+  create() { this.router.navigate(['/members/create']); }
   edit(id: number) { this.router.navigate(['/members', id, 'edit']); }
 
   delete(m: Member) {

@@ -65,11 +65,9 @@ namespace QuanLyDoanVien.Helpers
             {
                 summary.TotalMembers++;
 
-                // ── Giới tính ────────────────────────────────────────────────
                 if (m.Gender == "Nam")       summary.MaleCount++;
                 else if (m.Gender == "Nữ")  summary.FemaleCount++;
 
-                // ── Tuổi ────────────────────────────────────────────────────
                 int? age = null;
                 if (m.DateOfBirth.HasValue)
                 {
@@ -80,7 +78,6 @@ namespace QuanLyDoanVien.Helpers
                     else if (age >= 31)              summary.Age31Plus++;
                 }
 
-                // ── Dân tộc ─────────────────────────────────────────────────
                 var eth = m.Ethnicity ?? "";
                 if (string.IsNullOrEmpty(eth) || eth.ToLower().Contains("kinh"))
                     summary.EthnicityKinh++;
@@ -91,24 +88,21 @@ namespace QuanLyDoanVien.Helpers
                 var rel = string.IsNullOrEmpty(m.Religion) ? "Không" : m.Religion;
                 IncrementDict(summary.Religions, rel);
 
-                // ── Đảng viên ───────────────────────────────────────────────
                 if (m.PartyDateProbationary.HasValue) summary.PartyProbationaryCount++;
                 if (m.PartyDateOfficial.HasValue)     summary.PartyOfficialCount++;
 
-                // ── Nghề nghiệp ─────────────────────────────────────────────
+
                 var prof = MapCategory(m.Profession,
                     ("Công chức",  new[] { "công chức" }),
                     ("Viên chức",  new[] { "viên chức" }),
                     ("Sinh viên",  new[] { "sinh viên", "học sinh" })) ?? "Khác";
                 summary.Professions[prof]++;
 
-                // ── Học vấn ─────────────────────────────────────────────────
                 var edu = MapCategory(m.Education,
                     ("THCS", new[] { "thcs", "cấp 2" }),
                     ("THPT", new[] { "thpt", "cấp 3" })) ?? "Khác";
                 summary.Educations[edu]++;
 
-                // ── Chuyên môn ─────────────────────────────────────────────
                 var exp = MapCategory(m.Expertise,
                     ("Tiến sĩ",  new[] { "tiến sĩ", "ts", "tiến sỹ" }),
                     ("Thạc sĩ",  new[] { "thạc sĩ", "thạc sỹ", "ths" }),
@@ -116,7 +110,6 @@ namespace QuanLyDoanVien.Helpers
                     ("Cao đẳng", new[] { "cao đẳng", "cđ" })) ?? "Khác";
                 summary.Expertises[exp]++;
 
-                // ── Lý luận chính trị ───────────────────────────────────────
                 var pol = MapCategory(m.PoliticalTheory,
                     ("Cử nhân",  new[] { "cử nhân" }),
                     ("Cao cấp",  new[] { "cao cấp" }),
@@ -124,7 +117,6 @@ namespace QuanLyDoanVien.Helpers
                     ("Sơ cấp",   new[] { "sơ cấp" })) ?? "Khác";
                 summary.PoliticalTheories[pol]++;
 
-                // ── Chức vụ chủ chốt ─────────────────────────────────────
                 var pos = (m.Position ?? "").ToLower();
                 var roles = new List<string>();
                 MapRole(pos, "ban chấp hành", "Ban chấp hành", roles, summary.PositionRoles);
@@ -157,7 +149,6 @@ namespace QuanLyDoanVien.Helpers
             return summary;
         }
 
-        // ── Helpers ─────────────────────────────────────────────────────────
         private static void IncrementDict(Dictionary<string, int> dict, string key)
         {
             if (!dict.ContainsKey(key)) dict[key] = 0;

@@ -14,7 +14,6 @@
 
     <form [formGroup]="form" class="form-grid" *ngIf="!loading">
 
-      <!-- ===== THÔNG TIN CƠ BẢN ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Họ và tên <span style="color:red">*</span></mat-label>
         <input matInput formControlName="fullName" required>
@@ -29,7 +28,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- ===== NGÀY SINH + ĐỘ TUỔI ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Ngày sinh</mat-label>
         <input matInput [matDatepicker]="picker1" formControlName="dateOfBirth">
@@ -47,7 +45,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- ===== THÔNG TIN ĐOÀN ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Ngày vào đoàn</mat-label>
         <input matInput [matDatepicker]="picker2" formControlName="joinDate">
@@ -75,7 +72,6 @@
         <input matInput formControlName="cardNumber">
       </mat-form-field>
 
-      <!-- ===== CHỨC VỤ CHỦ CHỐT ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Chức vụ chủ chốt đảm nhiệm</mat-label>
         <mat-select formControlName="mainPosition">
@@ -84,7 +80,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- ===== DÂN TỘC & TÔN GIÁO ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Dân tộc</mat-label>
         <input matInput formControlName="ethnicity">
@@ -95,13 +90,11 @@
         <input matInput formControlName="religion">
       </mat-form-field>
 
-      <!-- ===== NGHỀ NGHIỆP ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Nghề nghiệp</mat-label>
         <input matInput formControlName="profession">
       </mat-form-field>
 
-      <!-- ===== HỌC VẤN (DROPDOWN) ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Học vấn</mat-label>
         <mat-select formControlName="education">
@@ -110,7 +103,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- ===== CHUYÊN MÔN (DROPDOWN) ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Chuyên môn</mat-label>
         <mat-select formControlName="expertise">
@@ -119,7 +111,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- ===== LÝ LUẬN CHÍNH TRỊ (DROPDOWN) ===== -->
       <mat-form-field appearance="outline">
         <mat-label>Lý luận chính trị</mat-label>
         <mat-select formControlName="politicalTheory">
@@ -128,7 +119,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- ===== ĐỊA CHỈ VÀ GHI CHÚ ===== -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Địa chỉ</mat-label>
         <input matInput formControlName="address">
@@ -139,10 +129,10 @@
         <textarea matInput formControlName="notes" rows="3"></textarea>
       </mat-form-field>
 
-      <!-- ===== TRẠNG THÁI ===== -->
       <div class="checkbox-group" style="padding: 12px;">
         <mat-checkbox formControlName="isUnionMember" color="primary">Là Đoàn viên</mat-checkbox>
-        <mat-checkbox formControlName="isActive" color="primary" style="margin-left: 20px;">Đang sinh hoạt</mat-checkbox>
+        <mat-checkbox formControlName="isActive" color="primary" style="margin-left: 20px;">Đang sinh
+          hoạt</mat-checkbox>
       </div>
 
     </form>

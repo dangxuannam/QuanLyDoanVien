@@ -32,7 +32,6 @@ export class FileUploadComponent implements OnInit {
   recentFiles: FileAttachment[] = [];
   loadingFiles = true;
 
-  // Chọn đơn vị khi import đoàn viên
   units: any[] = [];
   selectedUnitId: number | null = null;
 
@@ -41,7 +40,7 @@ export class FileUploadComponent implements OnInit {
     protected router: Router,
     protected route: ActivatedRoute,
     protected snack: MatSnackBar
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.module = this.route.snapshot.data['module'] || 'HE_THONG';
@@ -66,7 +65,6 @@ export class FileUploadComponent implements OnInit {
     });
   }
 
-  // ── File selection (input or drag-drop) ───────────────────────────────────
   onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
@@ -93,7 +91,7 @@ export class FileUploadComponent implements OnInit {
         this.snack.open(`"${f.name}" không phải file Excel (.xlsx, .xls)`, 'Đóng', { duration: 3000 });
         return;
       }
-      // Tránh thêm trùng tên
+
       if (this.fileQueue.some(q => q.file.name === f.name && q.file.size === f.size)) return;
       this.fileQueue.push({ file: f, status: 'pending', progress: 0 });
     });
@@ -108,10 +106,9 @@ export class FileUploadComponent implements OnInit {
   }
 
   get pendingCount() { return this.fileQueue.filter(f => f.status === 'pending').length; }
-  get doneCount()    { return this.fileQueue.filter(f => f.status === 'done').length; }
-  get hasQueue()     { return this.fileQueue.length > 0; }
+  get doneCount() { return this.fileQueue.filter(f => f.status === 'done').length; }
+  get hasQueue() { return this.fileQueue.length > 0; }
 
-  // ── Upload tất cả file pending ────────────────────────────────────────────
   uploadAll() {
     const pending = this.fileQueue.filter(f => f.status === 'pending');
     if (!pending.length) return;
@@ -119,7 +116,6 @@ export class FileUploadComponent implements OnInit {
     this.uploading = true;
     this.uploadProgress = 0;
 
-    // Đánh dấu tất cả đang upload
     pending.forEach(q => q.status = 'uploading');
 
     this.api.uploadMultipleFiles(pending.map(q => q.file), this.module).subscribe({
@@ -142,7 +138,6 @@ export class FileUploadComponent implements OnInit {
               qf.progress = 100;
               qf.result = res;
               successCount++;
-              // Nếu chỉ upload 1 file → tự mở preview
               if (pending.length === 1 && res.excelData) {
                 this.previewResult = res.excelData;
                 this.previewFileObj = res.file;
@@ -166,7 +161,6 @@ export class FileUploadComponent implements OnInit {
     });
   }
 
-  // ── Preview ───────────────────────────────────────────────────────────────
   previewFile(file: FileAttachment) {
     this.previewLoading = true;
     this.previewFileObj = file;

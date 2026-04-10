@@ -14,7 +14,7 @@ namespace QuanLyDoanVien.Api
     [ApiAuthorize]
     public class UnitsApiController : ApiController
     {
-        // ─── DANH SÁCH ĐƠN VỊ ────────────────────────────────────────────────
+        //DANH SÁCH ĐƠN VỊ
         [HttpGet, Route("")]
         public IHttpActionResult GetAll(int page = 1, int pageSize = 20, string search = "")
         {
@@ -52,7 +52,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── TẠO ĐƠN VỊ ──────────────────────────────────────────────────────
         [HttpPost, Route("")]
         [ApiAuthorize(Permission = "DV_CREATE")]
         public IHttpActionResult Create([FromBody] Unit req)
@@ -82,7 +81,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── CẬP NHẬT ĐƠN VỊ ────────────────────────────────────────────────
         [HttpPut, Route("{id:int}")]
         [ApiAuthorize(Permission = "DV_EDIT")]
         public IHttpActionResult Update(int id, [FromBody] Unit req)
@@ -102,7 +100,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── XÓA ĐƠN VỊ ──────────────────────────────────────────────────────
         [HttpDelete, Route("{id:int}")]
         [ApiAuthorize(Permission = "DV_DELETE")]
         public IHttpActionResult Delete(int id)
@@ -118,7 +115,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── XÓA NHIỀU ĐƠN VỊ CÙNG LÚC ───────────────────────────────────────
         [HttpPost, Route("delete-multiple")]
         [ApiAuthorize(Permission = "DV_DELETE")]
         public IHttpActionResult DeleteMultiple([FromBody] List<int> ids)
@@ -149,7 +145,7 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── IMPORT EXCEL → TỔNG HỢP ─────────────────────────────────────────
+        //IMPORT EXCEL → TỔNG HỢP 
         [HttpPost, Route("{id:int}/import")]
         [ApiAuthorize(Permission = "DV_CREATE")]
         public IHttpActionResult Import(int id, [FromBody] UnitImportRequest req)
@@ -232,12 +228,11 @@ namespace QuanLyDoanVien.Api
                             GroupId = null 
                         };
                         db.Members.Add(m);
-                        existingMembers.Add(m); // Tránh trùng lặp ngay trong cùng file
+                        existingMembers.Add(m); 
                     }
                     importedCount++;
                 }
 
-                // Tuần tự hoá summary sang JSON (dùng JavaScriptSerializer vì .NET 4.8)
                 var js = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
                 unit.SummaryJson       = js.Serialize(summary);
                 unit.TotalMembers      = summary.TotalMembers;
@@ -262,7 +257,7 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── IMPORT NHIỀU FILE EXCEL → BÁO CÁO GỘP ───────────────────────
+        //IMPORT NHIỀU FILE EXCEL → BÁO CÁO GỘP 
         [HttpPost, Route("{id:int}/import-multiple")]
         [ApiAuthorize(Permission = "DV_CREATE")]
         public IHttpActionResult ImportMultiple(int id, [FromBody] UnitImportMultipleRequest req)
@@ -377,7 +372,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── XEM BÁO CÁO TỔNG HỢP ───────────────────────────────────────────
         [HttpGet, Route("{id:int}/summary")]
         public IHttpActionResult GetSummary(int id)
         {
@@ -394,7 +388,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── TỔNG HỢP GỘP NHIỀU ĐƠN VỊ ─────────────────────────────────────
         [HttpPost, Route("combined-summary")]
         [ApiAuthorize(Permission = "DV_VIEW")]
         public IHttpActionResult CombinedSummary([FromBody] List<int> unitIds)
@@ -470,7 +463,6 @@ namespace QuanLyDoanVien.Api
             return key;
         }
 
-        // ─── XUẤT EXCEL MỘT ĐƠN VỊ ──────────────────────────────────────────
         [HttpGet, Route("{id:int}/export")]
         [ApiAuthorize(Permission = "DV_VIEW")]
         public IHttpActionResult ExportUnit(int id)
@@ -489,7 +481,7 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── XUẤT EXCEL TẤT CẢ ĐƠN VỊ ───────────────────────────────────────
+
         [HttpGet, Route("export-all")]
         [ApiAuthorize(Permission = "DV_VIEW")]
         public IHttpActionResult ExportAll()
@@ -510,7 +502,7 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── THỐNG KÊ TỔNG (DASHBOARD) ───────────────────────────────────────
+        //THỐNG KÊ TỔNG (DASHBOARD) 
         [HttpGet, Route("stats")]
         public IHttpActionResult Stats(int? unitId = null)
         {
@@ -556,12 +548,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════════════
-        //  PRIVATE HELPERS
-        // ═══════════════════════════════════════════════════════════════════════
-
-
-
         private UnitSummary BuildSummary(List<Dictionary<string, string>> data, string unitName, DateTime importedAt)
         {
             var summary = new UnitSummary
@@ -584,7 +570,6 @@ namespace QuanLyDoanVien.Api
 
                 summary.TotalMembers++;
 
-                // ── Giới tính ──────────────────────────────────────────────
                 string dobNam = GetVal(row, "Ngày, tháng, năm sinh - Nam");
                 string dobNu  = GetVal(row, "Ngày, tháng, năm sinh - Nữ");
                 string dobStr = !string.IsNullOrEmpty(dobNam) ? dobNam
@@ -601,7 +586,6 @@ namespace QuanLyDoanVien.Api
                 if (gender == "Nam") summary.MaleCount++;
                 else if (gender == "Nữ") summary.FemaleCount++;
 
-                // ── Ngày sinh → tuổi ──────────────────────────────────────
                 var dob = ParseDate(dobStr);
                 int? age = null;
                 if (dob.HasValue)
@@ -614,18 +598,15 @@ namespace QuanLyDoanVien.Api
                     else if (age >= 31) summary.Age31Plus++;
                 }
 
-                // ── Dân tộc ────────────────────────────────────────────────
                 string eth = GetVal(row, "Dân tộc");
                 if (string.IsNullOrEmpty(eth) || IsChecked(eth) || 
                     eth.ToLower().Contains("kinh")) summary.EthnicityKinh++;
                 else summary.EthnicityOther++;
 
-                // ── Tôn giáo ───────────────────────────────────────────────
                 string rel = GetVal(row, "Tôn giáo") ?? "Không";
                 if (IsChecked(rel)) rel = "Không";
                 IncrementDict(summary.Religions, rel);
 
-                // ── Đảng viên ─────────────────────────────────────────────
                 var partyProb = ParseDate(GetVal(row,
                     "Đoàn viên là đảng viên - Ngày kết nạp dự bị",
                     "Ngày kết nạp dự bị", "Dự bị"));
@@ -635,9 +616,6 @@ namespace QuanLyDoanVien.Api
                 if (partyProb.HasValue) summary.PartyProbationaryCount++;
                 if (partyOff.HasValue)  summary.PartyOfficialCount++;
 
-                // (Removed the CS0206 code here)
-                
-                // Let's use simpler logic for Mapping
                 string MapCat(string inp, string[] words, string ret) {
                     if (string.IsNullOrEmpty(inp)) return null;
                     var lw = inp.ToLower();
@@ -708,19 +686,14 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ── Xuất Excel 1 đơn vị (chi tiết từng người) ────────────────────────
         private byte[] BuildExcelForUnit(UnitSummary summary, string unitName, DateTime? importedAt)
         {
             using (var pkg = new OfficeOpenXml.ExcelPackage())
             {
-                // Sheet 1: Tổng hợp
                 var wsSummary = pkg.Workbook.Worksheets.Add("Tổng hợp");
                 WriteUnitSummarySheet(wsSummary, summary, unitName, importedAt);
-
-                // Sheet 2: Chi tiết từng người
                 var wsDetail = pkg.Workbook.Worksheets.Add("Chi tiết");
                 WriteUnitDetailSheet(wsDetail, summary);
-
                 return pkg.GetAsByteArray();
             }
         }
@@ -794,7 +767,6 @@ namespace QuanLyDoanVien.Api
             foreach (var kv in new[] { "Ban chấp hành", "Ban thường vụ", "Bí thư", "Phó Bí thư", "Cấp trưởng", "Cấp phó" }) 
                 SubRow(kv, summary.PositionRoles != null && summary.PositionRoles.ContainsKey(kv) ? summary.PositionRoles[kv] : 0);
 
-            // Tự động căn chỉnh và tạo viền (Border) toàn bộ bảng
             using (var range = ws.Cells[4, 1, r - 1, 2])
             {
                 range.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
@@ -855,7 +827,6 @@ namespace QuanLyDoanVien.Api
             ws.Cells.AutoFitColumns();
         }
 
-        // ── Xuất Excel tất cả đơn vị (dạng bảng tổng hợp) ───────────────────
         private byte[] BuildExcelAllUnits(List<UnitSummary> summaries)
         {
             using (var pkg = new OfficeOpenXml.ExcelPackage())
@@ -947,7 +918,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ── Trả về HTTP response Excel ────────────────────────────────────────
         private System.Web.Http.IHttpActionResult ExcelResponse(byte[] bytes, string fileName)
         {
             var result = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK)
@@ -961,7 +931,6 @@ namespace QuanLyDoanVien.Api
             return ResponseMessage(result);
         }
 
-        // ── Helpers ───────────────────────────────────────────────────────────
         private int GetDictVal(Dictionary<string, int> dict, string key)
         {
             if (dict == null) return 0;
@@ -1026,11 +995,6 @@ namespace QuanLyDoanVien.Api
             return System.Text.RegularExpressions.Regex.Replace(name, @"[^\w\-]", "_");
         }
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  DATA MODELS
-    // ═══════════════════════════════════════════════════════════════════════════
-
     public class UnitImportRequest
     {
         public int    FileId    { get; set; }

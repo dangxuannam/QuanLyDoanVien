@@ -5,27 +5,15 @@ using System.Linq;
 
 namespace QuanLyDoanVien.Helpers
 {
-    /// <summary>
-    /// Kho lưu trữ dữ liệu profiling trong RAM.
-    /// Thread-safe, tự động xóa các entry cũ hơn 30 phút.
-    /// </summary>
     public static class ProfileStore
     {
-        // Giới hạn 500 entry mới nhất để không tốn RAM
         private const int MaxEntries = 500;
-
-        // ConcurrentQueue đảm bảo thread-safe khi nhiều request đồng thời
         private static readonly ConcurrentQueue<RequestEntry> _requests
             = new ConcurrentQueue<RequestEntry>();
 
-        // Lưu riêng SQL queries (một request có thể có nhiều query)
         private static readonly ConcurrentQueue<SqlEntry> _sqlQueries
             = new ConcurrentQueue<SqlEntry>();
 
-        /// <summary>
-        /// Ghi lại một HTTP request đã hoàn tất.
-        /// Được gọi từ Application_EndRequest trong Global.asax.cs
-        /// </summary>
         public static void Record(string method, string path, double elapsedMs, int statusCode)
         {
             _requests.Enqueue(new RequestEntry
@@ -36,19 +24,12 @@ namespace QuanLyDoanVien.Helpers
                 StatusCode = statusCode,
                 Timestamp  = DateTime.Now
             });
-
-            // Giữ tối đa MaxEntries bản ghi
             while (_requests.Count > MaxEntries)
                 _requests.TryDequeue(out _);
         }
 
-        /// <summary>
-        /// Ghi lại một câu SQL query đã thực thi.
-        /// Được gọi từ EfTimingInterceptor.
-        /// </summary>
         public static void RecordSql(string sql, double elapsedMs, bool isError = false)
         {
-            // Rút gọn SQL dài để dễ đọc
             var shortSql = sql?.Length > 300 ? sql.Substring(0, 300) + "..." : sql;
 
             _sqlQueries.Enqueue(new SqlEntry
@@ -63,9 +44,6 @@ namespace QuanLyDoanVien.Helpers
                 _sqlQueries.TryDequeue(out _);
         }
 
-        /// <summary>
-        /// Lấy kết quả để hiển thị qua API.
-        /// </summary>
         public static ProfilerResult GetResults()
         {
             var cutoff   = DateTime.Now.AddMinutes(-30);
@@ -93,15 +71,12 @@ namespace QuanLyDoanVien.Helpers
             };
         }
 
-        /// <summary>Xóa toàn bộ dữ liệu đang lưu (dùng để reset khi test)</summary>
         public static void Clear()
         {
             while (_requests.TryDequeue(out _)) { }
             while (_sqlQueries.TryDequeue(out _)) { }
         }
     }
-
-    // ─── Data models ─────────────────────────────────────────────────────────
 
     public class ProfilerResult
     {

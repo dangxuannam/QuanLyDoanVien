@@ -3,11 +3,9 @@
   <span class="header-subtitle">Năm {{ year }}</span>
 </div>
 
-<!-- ── BỘ LỌC COMBOBOX ───────────────────────────────────────────────────── -->
 <mat-card class="filter-bar-card" style="margin-bottom:16px;">
   <mat-card-content>
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
-      <!-- Combobox cấp bậc -->
       <mat-form-field appearance="outline" style="min-width:180px;margin:0">
         <mat-label><mat-icon>account_tree</mat-icon> Cấp bậc</mat-label>
         <mat-select [(ngModel)]="selectedLevel" (ngModelChange)="onLevelChange()">
@@ -16,7 +14,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Combobox chi đoàn (lọc member stats) -->
       <mat-form-field appearance="outline" style="min-width:240px;margin:0">
         <mat-label><mat-icon>group</mat-icon> Lọc theo chi đoàn</mat-label>
         <mat-select [(ngModel)]="selectedGroupId" (ngModelChange)="onGroupChange()">
@@ -25,7 +22,6 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Combobox đơn vị (lọc unit stats) -->
       <mat-form-field appearance="outline" style="min-width:280px;margin:0">
         <mat-label><mat-icon>business</mat-icon> Lọc theo đơn vị</mat-label>
         <mat-select [(ngModel)]="selectedUnitId" (ngModelChange)="onUnitChange()">
@@ -37,7 +33,6 @@
   </mat-card-content>
 </mat-card>
 
-<!-- ── THỐNG KÊ ĐOÀN VIÊN (theo chi đoàn) ──────────────────────────────── -->
 <h3 class="section-title">
   <mat-icon>groups</mat-icon>
   Đoàn viên {{ selectedGroupId ? '– ' + getGroupName(selectedGroupId) : '' }}
@@ -84,7 +79,6 @@
   </mat-card>
 </div>
 
-<!-- Độ tuổi đoàn viên -->
 <div class="stat-grid stat-grid-3" style="margin-top:12px">
   <mat-card class="stat-card accent-light">
     <mat-card-content>
@@ -115,7 +109,6 @@
   </mat-card>
 </div>
 
-<!-- ── THỐNG KÊ ĐƠN VỊ (theo đơn vị đã import) ─────────────────────────── -->
 <h3 class="section-title" style="margin-top:24px">
   <mat-icon>business</mat-icon>
   Quản lý đơn vị {{ unitStats.unitName ? '– ' + unitStats.unitName : '' }}
@@ -197,7 +190,6 @@
   Đơn vị này chưa có dữ liệu tổng hợp. Hãy vào <a routerLink="/units">Quản lý đơn vị</a> để import Excel.
 </div>
 
-<!-- ── FILE GẦN ĐÂY ──────────────────────────────────────────────────────── -->
 <div class="dashboard-full" style="margin-top:16px">
   <mat-card>
     <mat-card-header>
@@ -210,7 +202,8 @@
         <mat-list-item *ngFor="let f of recentFiles">
           <mat-icon matListItemIcon color="primary">table_view</mat-icon>
           <span matListItemTitle>{{ f.originalName }}</span>
-          <span matListItemLine class="text-muted">{{ f.uploadedAt | date:'dd/MM/yyyy HH:mm' }} &bull; {{ f.sheetCount }} sheet</span>
+          <span matListItemLine class="text-muted">{{ f.uploadedAt | date:'dd/MM/yyyy HH:mm' }} &bull; {{ f.sheetCount
+            }} sheet</span>
         </mat-list-item>
         <p *ngIf="recentFiles.length === 0" class="text-muted no-data">Chưa có file nào</p>
       </mat-list>

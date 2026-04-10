@@ -11,7 +11,7 @@ namespace QuanLyDoanVien.Models.Entities
         [Required, MaxLength(50)]  public string GroupCode { get; set; }
         [Required, MaxLength(200)] public string GroupName { get; set; }
         [MaxLength(500)]           public string Description { get; set; }
-        [MaxLength(100)]           public string Level { get; set; }  // Trung ương, Tỉnh, TP, Huyện, Xã...
+        [MaxLength(100)]           public string Level { get; set; }  
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
@@ -57,8 +57,6 @@ namespace QuanLyDoanVien.Models.Entities
         [ForeignKey("GroupId")] public virtual MemberGroup Group { get; set; }
         [ForeignKey("UnitId")] public virtual Unit Unit { get; set; }
     }
-
-    /// <summary>Đơn vị (ví dụ: Trung tâm xúc tiến đầu tư, Sở Tài chính...)</summary>
     [Table("Units")]
     public class Unit
     {
@@ -71,10 +69,8 @@ namespace QuanLyDoanVien.Models.Entities
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
 
-        // Lưu dữ liệu tổng hợp dạng JSON sau khi import
         public string SummaryJson { get; set; }
 
-        // Metadata lần import cuối
         public int?      LastImportFileId { get; set; }
         public DateTime? LastImportAt     { get; set; }
         public int?      LastImportBy     { get; set; }

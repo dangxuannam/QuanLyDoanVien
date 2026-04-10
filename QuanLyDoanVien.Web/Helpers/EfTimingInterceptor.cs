@@ -6,21 +6,9 @@ using QuanLyDoanVien.Helpers;
 
 namespace QuanLyDoanVien.Helpers
 {
-    /// <summary>
-    /// EF6 Interceptor tự động đo thời gian của MỌI câu SQL query
-    /// mà Entity Framework sinh ra, KHÔNG cần thay đổi code trong Controllers.
-    ///
-    /// Cơ chế hoạt động:
-    ///   EF6 chuẩn bị SQL → NonQueryExecuting() / ReaderExecuting() → [SQL chạy trên DB]
-    ///   → NonQueryExecuted() / ReaderExecuted() → tính elapsed, ghi vào ProfileStore
-    ///
-    /// Đăng ký trong Global.asax.cs:
-    ///   DbInterception.Add(new EfTimingInterceptor());
-    /// </summary>
+
     public class EfTimingInterceptor : DbCommandInterceptor
     {
-        // ─── SELECT queries (DbDataReader) ───────────────────────────────────
-
         public override void ReaderExecuting(DbCommand command,
             DbCommandInterceptionContext<DbDataReader> interceptionContext)
         {
@@ -34,8 +22,6 @@ namespace QuanLyDoanVien.Helpers
             base.ReaderExecuted(command, interceptionContext);
             StopTimer(command, interceptionContext.Exception);
         }
-
-        // ─── INSERT / UPDATE / DELETE queries (NonQuery) ─────────────────────
 
         public override void NonQueryExecuting(DbCommand command,
             DbCommandInterceptionContext<int> interceptionContext)
@@ -51,8 +37,6 @@ namespace QuanLyDoanVien.Helpers
             StopTimer(command, interceptionContext.Exception);
         }
 
-        // ─── Scalar queries (COUNT, SUM, ...) ────────────────────────────────
-
         public override void ScalarExecuting(DbCommand command,
             DbCommandInterceptionContext<object> interceptionContext)
         {
@@ -67,23 +51,16 @@ namespace QuanLyDoanVien.Helpers
             StopTimer(command, interceptionContext.Exception);
         }
 
-        // ─── Helpers ─────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Lưu Stopwatch vào ExtendedProperties của DbCommand để dùng sau.
-        /// (Không thể dùng biến instance vì Interceptor là singleton, nhiều
-        ///  thread có thể gọi cùng lúc)
-        /// </summary>
         private static void StartTimer(DbCommand command)
         {
             try
             {
                 var sw = Stopwatch.StartNew();
-                command.GetHashCode(); // đảm bảo command tồn tại
+                command.GetHashCode(); 
                 // Lưu tạm vào Dictionary thread-safe per-command
                 TimerStore.Start(command, sw);
             }
-            catch { /* không bao giờ để interceptor làm crash app */ }
+            catch {  }
         }
 
         private static void StopTimer(DbCommand command, Exception exception)
@@ -99,14 +76,9 @@ namespace QuanLyDoanVien.Helpers
 
                 ProfileStore.RecordSql(sql, elapsed, isError: exception != null);
             }
-            catch { /* không bao giờ để interceptor làm crash app */ }
+            catch {  }
         }
     }
-
-    /// <summary>
-    /// Lưu trữ Stopwatch theo từng DbCommand (theo HashCode của object).
-    /// Thread-safe vì dùng ConcurrentDictionary.
-    /// </summary>
     internal static class TimerStore
     {
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, Stopwatch>
@@ -125,7 +97,6 @@ namespace QuanLyDoanVien.Helpers
         }
     }
 
-    // Alias tránh phải thêm using
     internal static class RuntimeHelpers
     {
         public static int GetHashCode(object obj)
