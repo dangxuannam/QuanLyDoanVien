@@ -13,7 +13,6 @@ namespace QuanLyDoanVien.Api
     [ApiAuthorize]
     public class ReportsApiController : ApiController
     {
-        // ─── BÁO CÁO THỐNG KÊ ĐOÀN VIÊN THEO ĐƠN VỊ ─────────────────────────
         [HttpGet, Route("by-unit")]
         [ApiAuthorize(Permission = "DV_VIEW")]
         public IHttpActionResult GetByUnit()
@@ -25,7 +24,6 @@ namespace QuanLyDoanVien.Api
 
                 var result = units.Select(u =>
                 {
-                    // Ưu tiên dùng SummaryJson (dữ liệu chính xác từ import)
                     if (!string.IsNullOrEmpty(u.SummaryJson))
                     {
                         try
@@ -43,7 +41,6 @@ namespace QuanLyDoanVien.Api
                         }
                         catch { }
                     }
-                    // Fallback: đếm trực tiếp từ DB
                     return new
                     {
                         unitId   = u.Id,
@@ -64,14 +61,12 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── BÁO CÁO CƠ CẤU ĐOÀN VIÊN ────────────────────────────────────────
         [HttpGet, Route("demographics")]
         [ApiAuthorize(Permission = "DV_VIEW")]
         public IHttpActionResult GetDemographics(int? unitId = null)
         {
             using (var db = new AppDbContext())
             {
-                // Khi chọn đơn vị cụ thể: ưu tiên dùng SummaryJson của đơn vị
                 if (unitId.HasValue)
                 {
                     var unit = db.Units.Find(unitId.Value);
@@ -86,7 +81,6 @@ namespace QuanLyDoanVien.Api
                         catch { }
                     }
 
-                    // Fallback: query live từ Members theo UnitId
                     var members = db.Members.Where(m => m.IsActive && m.UnitId == unitId.Value).ToList();
                     return Ok(BuildDemographicsFromMembers(members));
                 }
@@ -97,7 +91,6 @@ namespace QuanLyDoanVien.Api
             }
         }
 
-        // ─── BUILD TỪ SUMMARY JSON ────────────────────────────────────────────
         private object BuildDemographicsFromSummary(UnitSummary s)
         {
             int total = s.TotalMembers;
@@ -149,7 +142,6 @@ namespace QuanLyDoanVien.Api
                 .ToList();
         }
 
-        // ─── BUILD TỪ MEMBERS LIVE ────────────────────────────────────────────
         private object BuildDemographicsFromMembers(List<Models.Entities.Member> members)
         {
             int total = members.Count;
@@ -228,7 +220,7 @@ namespace QuanLyDoanVien.Api
             };
         }
 
-        // ─── HELPERS ───────────────────────────────────────────────────────────
+        
         private string Capitalize(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return s;

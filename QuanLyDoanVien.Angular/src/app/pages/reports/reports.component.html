@@ -1,5 +1,4 @@
 <div class="reports-page">
-  <!-- ── PAGE HEADER ───────────────────────────────────────────────── -->
   <div class="page-header">
     <div class="header-left">
       <mat-icon class="header-icon">bar_chart</mat-icon>
@@ -10,51 +9,28 @@
     </div>
   </div>
 
-  <!-- ── TAB BAR ──────────────────────────────────────────────────── -->
   <div class="tab-bar">
     <button class="tab-btn" [class.active]="activeTab === 'unit'" (click)="switchTab('unit')" id="tab-by-unit">
       <mat-icon>domain</mat-icon> Thống kê theo Đơn vị
     </button>
-    <button class="tab-btn" [class.active]="activeTab === 'demographics'" (click)="switchTab('demographics')" id="tab-demographics">
+    <button class="tab-btn" [class.active]="activeTab === 'demographics'" (click)="switchTab('demographics')"
+      id="tab-demographics">
       <mat-icon>people</mat-icon> Cơ cấu Đoàn viên
     </button>
   </div>
 
-  <!-- ══ TAB 1 – THỐNG KÊ THEO ĐƠN VỊ ═══════════════════════════════ -->
   <div *ngIf="activeTab === 'unit'">
     <div *ngIf="loadingUnit" class="center-spinner">
       <mat-spinner diameter="48"></mat-spinner>
     </div>
 
     <ng-container *ngIf="!loadingUnit && unitReport">
-      <!-- Summary cards -->
       <div class="summary-cards">
         <div class="scard scard-primary">
           <mat-icon>groups</mat-icon>
           <div class="scard-body">
             <span class="scard-num">{{ unitReport.grandTotal }}</span>
             <span class="scard-lbl">Tổng đoàn viên</span>
-          </div>
-        </div>
-        <div class="scard scard-blue">
-          <mat-icon>man</mat-icon>
-          <div class="scard-body">
-            <span class="scard-num">{{ unitReport.totalMale }}</span>
-            <span class="scard-lbl">Nam</span>
-          </div>
-        </div>
-        <div class="scard scard-pink">
-          <mat-icon>woman</mat-icon>
-          <div class="scard-body">
-            <span class="scard-num">{{ unitReport.totalFemale }}</span>
-            <span class="scard-lbl">Nữ</span>
-          </div>
-        </div>
-        <div class="scard scard-warn">
-          <mat-icon>domain_disabled</mat-icon>
-          <div class="scard-body">
-            <span class="scard-num">{{ unitReport.noUnit }}</span>
-            <span class="scard-lbl">Chưa gán đơn vị</span>
           </div>
         </div>
         <div class="scard scard-green">
@@ -66,7 +42,6 @@
         </div>
       </div>
 
-      <!-- Bar chart per unit -->
       <mat-card class="report-card">
         <mat-card-header>
           <mat-card-title>
@@ -78,9 +53,8 @@
             <div *ngFor="let u of unitReport.units; let i = index" class="chart-row">
               <div class="chart-label" [title]="u.unitName">{{ u.unitName }}</div>
               <div class="chart-bar-wrap">
-                <div class="chart-bar"
-                     [style.width.%]="pct(u.total, unitReport.grandTotal)"
-                     [style.background]="getBarColor(i)">
+                <div class="chart-bar" [style.width.%]="pct(u.total, unitReport.grandTotal)"
+                  [style.background]="getBarColor(i)">
                 </div>
               </div>
               <div class="chart-value">
@@ -91,8 +65,7 @@
             <div *ngIf="unitReport.noUnit > 0" class="chart-row chart-row-warn">
               <div class="chart-label">Chưa gán đơn vị</div>
               <div class="chart-bar-wrap">
-                <div class="chart-bar chart-bar-muted"
-                     [style.width.%]="pct(unitReport.noUnit, unitReport.grandTotal)">
+                <div class="chart-bar chart-bar-muted" [style.width.%]="pct(unitReport.noUnit, unitReport.grandTotal)">
                 </div>
               </div>
               <div class="chart-value">
@@ -103,7 +76,6 @@
         </mat-card-content>
       </mat-card>
 
-      <!-- Detail table -->
       <mat-card class="report-card">
         <mat-card-header>
           <mat-card-title>
@@ -156,9 +128,7 @@
     </ng-container>
   </div>
 
-  <!-- ══ TAB 2 – CƠ CẤU ĐOÀN VIÊN ══════════════════════════════════ -->
   <div *ngIf="activeTab === 'demographics'">
-    <!-- Filter -->
     <mat-card class="filter-card">
       <div class="filter-row">
         <mat-icon>filter_list</mat-icon>
@@ -187,7 +157,6 @@
 
       <div class="demo-grid">
 
-        <!-- Giới tính -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon gender-icon">wc</mat-icon>
@@ -200,7 +169,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -208,7 +177,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Độ tuổi -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon age-icon">cake</mat-icon>
@@ -220,7 +188,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -228,7 +196,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Dân tộc -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon ethnic-icon">public</mat-icon>
@@ -240,7 +207,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -248,7 +215,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Tôn giáo -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon religion-icon">self_improvement</mat-icon>
@@ -260,7 +226,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -268,7 +234,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Học vấn -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon edu-icon">school</mat-icon>
@@ -280,7 +245,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -288,7 +253,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Chuyên môn -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon expertise-icon">workspace_premium</mat-icon>
@@ -300,7 +264,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -308,7 +272,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Nghề nghiệp -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon prof-icon">work</mat-icon>
@@ -320,7 +283,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -328,7 +291,6 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- Lý luận chính trị -->
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon political-icon">military_tech</mat-icon>
@@ -340,7 +302,7 @@
                 <span class="demo-lbl">{{ g.label }}</span>
                 <div class="demo-bar-track">
                   <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
-                       [style.background]="getBarColor(i)"></div>
+                    [style.background]="getBarColor(i)"></div>
                 </div>
                 <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
               </div>
@@ -348,7 +310,7 @@
           </mat-card-content>
         </mat-card>
 
-      </div><!-- /demo-grid -->
+      </div>
     </ng-container>
   </div>
 </div>
