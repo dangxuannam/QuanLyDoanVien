@@ -42,6 +42,13 @@
         <mat-icon matListItemIcon>business</mat-icon>
         <span matListItemTitle>Quản lý đơn vị</span>
       </a>
+
+      <!-- Báo cáo Thống kê – luôn hiển thị -->
+      <a mat-list-item (click)="navigate('/reports')"
+        [class.active-link]="isActive('/reports')" id="menu-reports">
+        <mat-icon matListItemIcon>bar_chart</mat-icon>
+        <span matListItemTitle>Báo cáo Thống kê</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 

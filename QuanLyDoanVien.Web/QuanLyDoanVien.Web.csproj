@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\AuthApiController.cs" />
+    <Compile Include="Api\ReportsApiController.cs" />
     <Compile Include="Api\FileApiController.cs" />
     <Compile Include="Api\OtherApiControllers.cs" />
     <Compile Include="Api\ProfilerApiController.cs" />

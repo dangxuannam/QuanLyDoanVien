@@ -143,6 +143,14 @@ export class ApiService {
     return `${this.base}/units/export-all?token=${token}`;
   }
 
+  // Reports
+  getReportByUnit(): Observable<any> { return this.get('/reports/by-unit'); }
+  getReportDemographics(unitId?: number): Observable<any> {
+    const params: any = {};
+    if (unitId != null) params['unitId'] = unitId;
+    return this.get('/reports/demographics', params);
+  }
+
   // Audit 
   getAuditLogs(page = 1, pageSize = 20, search = ''): Observable<PagedResult<AuditLog>> {
     return this.get<PagedResult<AuditLog>>('/audit', { page, pageSize, search });

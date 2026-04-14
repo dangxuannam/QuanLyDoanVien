@@ -1,0 +1,354 @@
+<div class="reports-page">
+  <!-- ── PAGE HEADER ───────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">bar_chart</mat-icon>
+      <div>
+        <h1 class="page-title">Báo cáo Thống kê</h1>
+        <p class="page-subtitle">Tổng hợp số liệu đoàn viên theo đơn vị và cơ cấu</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB BAR ──────────────────────────────────────────────────── -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'unit'" (click)="switchTab('unit')" id="tab-by-unit">
+      <mat-icon>domain</mat-icon> Thống kê theo Đơn vị
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'demographics'" (click)="switchTab('demographics')" id="tab-demographics">
+      <mat-icon>people</mat-icon> Cơ cấu Đoàn viên
+    </button>
+  </div>
+
+  <!-- ══ TAB 1 – THỐNG KÊ THEO ĐƠN VỊ ═══════════════════════════════ -->
+  <div *ngIf="activeTab === 'unit'">
+    <div *ngIf="loadingUnit" class="center-spinner">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+
+    <ng-container *ngIf="!loadingUnit && unitReport">
+      <!-- Summary cards -->
+      <div class="summary-cards">
+        <div class="scard scard-primary">
+          <mat-icon>groups</mat-icon>
+          <div class="scard-body">
+            <span class="scard-num">{{ unitReport.grandTotal }}</span>
+            <span class="scard-lbl">Tổng đoàn viên</span>
+          </div>
+        </div>
+        <div class="scard scard-blue">
+          <mat-icon>man</mat-icon>
+          <div class="scard-body">
+            <span class="scard-num">{{ unitReport.totalMale }}</span>
+            <span class="scard-lbl">Nam</span>
+          </div>
+        </div>
+        <div class="scard scard-pink">
+          <mat-icon>woman</mat-icon>
+          <div class="scard-body">
+            <span class="scard-num">{{ unitReport.totalFemale }}</span>
+            <span class="scard-lbl">Nữ</span>
+          </div>
+        </div>
+        <div class="scard scard-warn">
+          <mat-icon>domain_disabled</mat-icon>
+          <div class="scard-body">
+            <span class="scard-num">{{ unitReport.noUnit }}</span>
+            <span class="scard-lbl">Chưa gán đơn vị</span>
+          </div>
+        </div>
+        <div class="scard scard-green">
+          <mat-icon>business</mat-icon>
+          <div class="scard-body">
+            <span class="scard-num">{{ unitReport.units.length }}</span>
+            <span class="scard-lbl">Số đơn vị</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar chart per unit -->
+      <mat-card class="report-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>bar_chart</mat-icon> Số lượng đoàn viên theo từng đơn vị
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrap">
+            <div *ngFor="let u of unitReport.units; let i = index" class="chart-row">
+              <div class="chart-label" [title]="u.unitName">{{ u.unitName }}</div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar"
+                     [style.width.%]="pct(u.total, unitReport.grandTotal)"
+                     [style.background]="getBarColor(i)">
+                </div>
+              </div>
+              <div class="chart-value">
+                <span class="tv-total">{{ u.total }}</span>
+                <span class="tv-detail">(♂ {{ u.male }} / ♀ {{ u.female }})</span>
+              </div>
+            </div>
+            <div *ngIf="unitReport.noUnit > 0" class="chart-row chart-row-warn">
+              <div class="chart-label">Chưa gán đơn vị</div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar chart-bar-muted"
+                     [style.width.%]="pct(unitReport.noUnit, unitReport.grandTotal)">
+                </div>
+              </div>
+              <div class="chart-value">
+                <span class="tv-total">{{ unitReport.noUnit }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Detail table -->
+      <mat-card class="report-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>table_chart</mat-icon> Bảng chi tiết theo đơn vị
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="table-wrap">
+            <table class="rpt-table">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Mã đơn vị</th>
+                  <th>Tên đơn vị</th>
+                  <th class="num">Tổng</th>
+                  <th class="num">Nam</th>
+                  <th class="num">Nữ</th>
+                  <th class="num">Tỷ lệ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let u of unitReport.units; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td><span class="code-chip">{{ u.unitCode }}</span></td>
+                  <td>{{ u.unitName }}</td>
+                  <td class="num bold">{{ u.total }}</td>
+                  <td class="num">{{ u.male }}</td>
+                  <td class="num">{{ u.female }}</td>
+                  <td class="num">
+                    <div class="pct-bar">
+                      <div class="pct-fill" [style.width.%]="pct(u.total, unitReport.grandTotal)"></div>
+                      <span>{{ pct(u.total, unitReport.grandTotal) }}%</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="3"><strong>TỔNG CỘNG</strong></td>
+                  <td class="num bold">{{ unitReport.grandTotal }}</td>
+                  <td class="num bold">{{ unitReport.totalMale }}</td>
+                  <td class="num bold">{{ unitReport.totalFemale }}</td>
+                  <td class="num">100%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+  </div>
+
+  <!-- ══ TAB 2 – CƠ CẤU ĐOÀN VIÊN ══════════════════════════════════ -->
+  <div *ngIf="activeTab === 'demographics'">
+    <!-- Filter -->
+    <mat-card class="filter-card">
+      <div class="filter-row">
+        <mat-icon>filter_list</mat-icon>
+        <mat-form-field appearance="outline" class="unit-select">
+          <mat-label>Lọc theo đơn vị</mat-label>
+          <mat-select [(ngModel)]="selectedUnitId" (ngModelChange)="onUnitFilterChange($event)" id="unit-filter-select">
+            <mat-option [value]="null">Tất cả đơn vị</mat-option>
+            <mat-option *ngFor="let u of units" [value]="u.id">{{ u.unitName }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="loadDemographics()" id="btn-reload-demographics">
+          <mat-icon>refresh</mat-icon> Cập nhật
+        </button>
+      </div>
+    </mat-card>
+
+    <div *ngIf="loadingDemographics" class="center-spinner">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+
+    <ng-container *ngIf="!loadingDemographics && demographics">
+      <div class="demo-total-badge">
+        <mat-icon>groups</mat-icon>
+        Tổng đoàn viên trong báo cáo: <strong>{{ demographics.total }}</strong>
+      </div>
+
+      <div class="demo-grid">
+
+        <!-- Giới tính -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon gender-icon">wc</mat-icon>
+            <mat-card-title>Giới tính</mat-card-title>
+            <mat-card-subtitle>{{ demographics.total }} đoàn viên</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byGender; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Độ tuổi -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon age-icon">cake</mat-icon>
+            <mat-card-title>Độ tuổi</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byAge; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Dân tộc -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon ethnic-icon">public</mat-icon>
+            <mat-card-title>Dân tộc</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byEthnicity; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Tôn giáo -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon religion-icon">self_improvement</mat-icon>
+            <mat-card-title>Tôn giáo</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byReligion; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Học vấn -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon edu-icon">school</mat-icon>
+            <mat-card-title>Trình độ học vấn</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byEducation; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Chuyên môn -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon expertise-icon">workspace_premium</mat-icon>
+            <mat-card-title>Trình độ chuyên môn</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byExpertise; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Nghề nghiệp -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon prof-icon">work</mat-icon>
+            <mat-card-title>Nghề nghiệp</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byProfession; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Lý luận chính trị -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon political-icon">military_tech</mat-icon>
+            <mat-card-title>Lý luận chính trị</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div *ngFor="let g of demographics.byPoliticalTheory; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                       [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div><!-- /demo-grid -->
+    </ng-container>
+  </div>
+</div>
