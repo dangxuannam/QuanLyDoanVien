@@ -116,6 +116,7 @@ export interface Member {
   healthStatus?: string;
   partyDateProbationary?: Date;
   partyDateOfficial?: Date;
+  ageCategory?: string;
 }
 
 export interface MemberGroup {

@@ -22,7 +22,10 @@ export class MemberFormComponent implements OnInit {
   expertiseOptions = ['Cao đẳng', 'Đại học', 'Thạc sỹ', 'Tiến sỹ'];
   politicalTheoryOptions = ['Sơ cấp', 'Trung cấp', 'Cao cấp', 'Cử nhân'];
   mainPositionOptions = ['Ban chấp hành', 'Ban thường vụ', 'Bí thư', 'Phó bí thư'];
-  ageCategoryOptions = ['Từ 18 đến đủ 25 tuổi', 'Từ 26 đến đủ 30 tuổi', 'Trên 30 tuổi'];
+  specialistPositionOptions = ['Cấp trưởng', 'Cấp phó'];
+  partyCommitteeOptions = ['Tham gia cấp ủy cấp trên cơ sở', 'Tham gia cấp ủy cơ sở'];
+  ageCategoryOptions = ['Từ 18 đến đủ 25 tuổi', 'Từ 26 đến đủ 30 tuổi', 'Từ 31 tuổi trở lên'];
+  professionOptions = ['Công chức', 'Viên chức', 'Sinh viên', 'Khác'];
 
   constructor(
     private fb: FormBuilder,
@@ -34,7 +37,6 @@ export class MemberFormComponent implements OnInit {
     this.form = this.fb.group({
       fullName: ['', Validators.required],
       memberCode: [''],
-      address: [''],
       dateOfBirth: [null],
       joinDate: [null],
       groupId: [null],
@@ -42,16 +44,16 @@ export class MemberFormComponent implements OnInit {
       gender: [''],
       ethnicity: [''],
       religion: [''],
-      profession: [''],
-      cardNumber: [''],             // Sổ đoàn viên
-      mainPosition: [''],           // Chức vụ chủ chốt
+      mainPosition: [''],           // Số đoàn viên đảm nhiệm nhiệm vụ chủ chốt
+      specialistPosition: [''],     // Chuyên môn (cấp trưởng/cấp phó)
+      profession: [''],             // Nghề nghiệp
+      notes: [''],                  // Lưu giá trị tham gia đảng ủy
       education: [''],              // Học vấn (dropdown)
-      expertise: [''],              // Chuyên môn (dropdown)
+      expertise: [''],              // Chuyên môn học vấn (dropdown)
       politicalTheory: [''],        // Lý luận chính trị (dropdown)
       ageCategory: [''],            // Độ tuổi (tính tự động, user xác nhận)
       isUnionMember: [true],
       isActive: [true],
-      notes: [''],
       // Trường position vẫn giữ nhưng ẩn (dùng cho import)
       position: ['']
     });
@@ -88,8 +90,8 @@ export class MemberFormComponent implements OnInit {
       category = 'Từ 18 đến đủ 25 tuổi';
     } else if (age >= 26 && age <= 30) {
       category = 'Từ 26 đến đủ 30 tuổi';
-    } else if (age > 30) {
-      category = 'Trên 30 tuổi';
+    } else if (age >= 31) {
+      category = 'Từ 31 tuổi trở lên';
     }
 
     this.ageLabel = age >= 0 ? `${age} tuổi` : '';
@@ -107,6 +109,21 @@ export class MemberFormComponent implements OnInit {
       next: (res) => {
         this.form.patchValue(res);
         if (res.dateOfBirth) this.calculateAge(res.dateOfBirth);
+        // Parse position string to restore mainPosition and specialistPosition
+        if (res.position) {
+          const parts = (res.position as string).split(',').map((p: string) => p.trim());
+          const mainPos = parts.find((p: string) => this.mainPositionOptions.some(mp => p.toLowerCase() === mp.toLowerCase())) || '';
+          const specPos = parts.find((p: string) => this.specialistPositionOptions.some(sp => p.toLowerCase() === sp.toLowerCase())) || '';
+          this.form.patchValue({ mainPosition: mainPos, specialistPosition: specPos });
+        }
+        // Restore partyCommittee from notes field
+        if (res.notes) {
+          const noteVal = res.notes as string;
+          const matchedParty = this.partyCommitteeOptions.find(o => noteVal.includes(o));
+          if (matchedParty) {
+            this.form.patchValue({ notes: matchedParty });
+          }
+        }
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -116,7 +133,8 @@ export class MemberFormComponent implements OnInit {
   save() {
     if (this.form.invalid) return;
     this.loading = true;
-    const value = { ...this.form.value, position: this.form.value.mainPosition };
+    const positionParts = [this.form.value.mainPosition, this.form.value.specialistPosition].filter(p => !!p);
+    const value = { ...this.form.value, position: positionParts.join(', ') };
     const obs = this.isEdit
       ? this.api.updateMember(this.memberId!, value)
       : this.api.createMember(value);

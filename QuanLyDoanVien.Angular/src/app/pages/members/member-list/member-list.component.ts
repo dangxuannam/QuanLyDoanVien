@@ -8,7 +8,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
-@Component({ selector: 'app-member-list', templateUrl: './member-list.component.html' })
+@Component({ selector: 'app-member-list', templateUrl: './member-list.component.html', styleUrls: ['./member-list.component.css'] })
 export class MemberListComponent implements OnInit, OnDestroy {
   members: Member[] = [];
   selection = new SelectionModel<Member>(true, []);
@@ -18,11 +18,10 @@ export class MemberListComponent implements OnInit, OnDestroy {
   search = '';
   loading = false;
 
-  /* ── RxJS: debounce search ──────────────────────────────────────────── */
+
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  /* ── Bộ lọc ──────────────────────────────────────────────────────── */
   groups: MemberGroup[] = [];
   units: any[] = [];
   selectedGroupId: number | null = null;
@@ -31,11 +30,39 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
   readonly LEVELS = ['Trung ương', 'Tỉnh', 'Thành phố', 'Huyện', 'Xã / Phường', 'Cơ sở'];
 
-  displayedColumns = [
-    'select', 'fullName', 'gender', 'birthDate',
-    'ethnicity', 'religion', 'profession', 'education', 'expertise',
-    'politicalTheory', 'partyProb', 'partyOff', 'position', 'cardNumber', 'actions'
-  ];
+  // Helper: party committee from notes field
+  getAgeCategory(m: any): string {
+    if (!m.dateOfBirth) return '';
+    const birthDate = new Date(m.dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const mth = today.getMonth() - birthDate.getMonth();
+    if (mth < 0 || (mth === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age >= 18 && age <= 25) return '18-25';
+    if (age >= 26 && age <= 30) return '26-30';
+    if (age >= 31) return '31+';
+    return '';
+  }
+
+  hasPartyAboveBase(m: any): boolean {
+    return !!(m.notes && m.notes.toLowerCase().includes('trên cơ sở'));
+  }
+  hasPartyBase(m: any): boolean {
+    return !!(m.notes && m.notes.toLowerCase().includes('cơ sở') && !m.notes.toLowerCase().includes('trên cơ sở'));
+  }
+
+  // Helper: position from position field
+  private posHas(m: any, keyword: string): boolean {
+    return !!(m.position && m.position.toLowerCase().includes(keyword.toLowerCase()));
+  }
+  hasBCH(m: any): boolean { return this.posHas(m, 'ban chấp hành'); }
+  hasBTV(m: any): boolean { return this.posHas(m, 'ban thường vụ'); }
+  hasBiThu(m: any): boolean { return this.posHas(m, 'bí thư') && !this.posHas(m, 'phó bí thư'); }
+  hasPhoBiThu(m: any): boolean { return this.posHas(m, 'phó bí thư'); }
+  hasCapTruong(m: any): boolean { return this.posHas(m, 'cấp trưởng'); }
+  hasCapPho(m: any): boolean { return this.posHas(m, 'cấp phó'); }
 
   constructor(private api: ApiService, private router: Router, private snack: MatSnackBar) { }
 

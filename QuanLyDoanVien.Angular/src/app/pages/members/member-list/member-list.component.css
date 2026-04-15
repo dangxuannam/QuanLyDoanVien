@@ -1,0 +1,92 @@
+.member-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.member-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.member-table th,
+.member-table td {
+  border: 1px solid #e0e0e0;
+  padding: 6px 8px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.member-table thead tr:first-child th {
+  background: #1a237e;
+  color: #fff;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.member-table thead tr:nth-child(2) th {
+  background: #3949ab;
+  color: #fff;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.member-table thead tr:nth-child(3) th {
+  background: #5c6bc0;
+  color: #fff;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.member-table tbody tr:nth-child(even) {
+  background: #f5f7ff;
+}
+
+.member-table tbody tr:hover {
+  background: #e8eaf6;
+  transition: background 0.15s;
+}
+
+.member-table tbody td {
+  color: #333;
+}
+
+.member-table td.name-cell {
+  text-align: left;
+  font-weight: 500;
+  min-width: 130px;
+}
+
+.check-icon {
+  color: #1976d2;
+  font-size: 16px;
+}
+
+.center-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.page-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}

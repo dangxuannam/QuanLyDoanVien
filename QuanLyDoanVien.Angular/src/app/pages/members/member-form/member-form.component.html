@@ -68,15 +68,26 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Sổ đoàn viên (Số thẻ)</mat-label>
-        <input matInput formControlName="cardNumber">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Chức vụ chủ chốt đảm nhiệm</mat-label>
+        <mat-label>Số đoàn viên đảm nhiệm các nhiệm vụ chủ chốt</mat-label>
         <mat-select formControlName="mainPosition">
           <mat-option value="">-- Không đảm nhiệm --</mat-option>
           <mat-option *ngFor="let p of mainPositionOptions" [value]="p">{{ p }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Chuyên môn (chức vụ)</mat-label>
+        <mat-select formControlName="specialistPosition">
+          <mat-option value="">-- Không đảm nhiệm --</mat-option>
+          <mat-option *ngFor="let s of specialistPositionOptions" [value]="s">{{ s }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nghề nghiệp</mat-label>
+        <mat-select formControlName="profession">
+          <mat-option value="">-- Chọn --</mat-option>
+          <mat-option *ngFor="let p of professionOptions" [value]="p">{{ p }}</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -90,10 +101,6 @@
         <input matInput formControlName="religion">
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Nghề nghiệp</mat-label>
-        <input matInput formControlName="profession">
-      </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Học vấn</mat-label>
@@ -119,14 +126,13 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Địa chỉ</mat-label>
-        <input matInput formControlName="address">
-      </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Ghi chú (Tham gia cấp ủy, v.v.)</mat-label>
-        <textarea matInput formControlName="notes" rows="3"></textarea>
+        <mat-label>Tham gia đảng ủy</mat-label>
+        <mat-select formControlName="notes">
+          <mat-option value="">-- Không tham gia --</mat-option>
+          <mat-option *ngFor="let c of partyCommitteeOptions" [value]="c">{{ c }}</mat-option>
+        </mat-select>
       </mat-form-field>
 
       <div class="checkbox-group" style="padding: 12px;">
