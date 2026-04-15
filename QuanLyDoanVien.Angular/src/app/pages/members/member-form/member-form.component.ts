@@ -14,10 +14,8 @@ export class MemberFormComponent implements OnInit {
   groups: MemberGroup[] = [];
   units: any[] = [];
 
-  // --- Độ tuổi ---
   ageLabel: string = '';
 
-  // --- Dropdown options ---
   educationOptions = ['THCS', 'THPT'];
   expertiseOptions = ['Cao đẳng', 'Đại học', 'Thạc sỹ', 'Tiến sỹ'];
   politicalTheoryOptions = ['Sơ cấp', 'Trung cấp', 'Cao cấp', 'Cử nhân'];
@@ -54,7 +52,6 @@ export class MemberFormComponent implements OnInit {
       ageCategory: [''],            // Độ tuổi (tính tự động, user xác nhận)
       isUnionMember: [true],
       isActive: [true],
-      // Trường position vẫn giữ nhưng ẩn (dùng cho import)
       position: ['']
     });
   }

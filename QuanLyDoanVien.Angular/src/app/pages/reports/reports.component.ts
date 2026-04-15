@@ -34,10 +34,8 @@ interface DemographicsReport {
   byExpertise: ChartItem[];
   byProfession: ChartItem[];
   byPoliticalTheory: ChartItem[];
-  // ── Mới: Cấp ủy ──────────────────────────────────────────
   upperPartyCommittee: number;
   basePartyCommittee: number;
-  // ── Mới: Chức vụ chủ chốt & Chuyên môn ──────────────────
   byKeyPosition: ChartItem[];
   bySpecialistPosition: ChartItem[];
 }

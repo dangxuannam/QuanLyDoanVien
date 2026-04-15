@@ -1,12 +1,12 @@
 <div class="page-container">
-  <!-- ── HEADER ──────────────────────────────────────────────────────── -->
   <div class="page-header">
     <div>
       <h1 class="page-title"><mat-icon>business</mat-icon> Quản lý đơn vị</h1>
       <p class="page-subtitle">Quản lý danh sách đơn vị và tổng hợp dữ liệu từ Excel</p>
     </div>
     <div class="header-actions">
-      <button mat-raised-button color="warn" (click)="bulkDelete()" *ngIf="selection.hasValue()" style="margin-right:8px">
+      <button mat-raised-button color="warn" (click)="bulkDelete()" *ngIf="selection.hasValue()"
+        style="margin-right:8px">
         <mat-icon>delete_sweep</mat-icon> Xóa đã chọn ({{ selection.selected.length }})
       </button>
       <button mat-stroked-button (click)="exportAll()" matTooltip="Xuất tổng hợp tất cả đơn vị">
@@ -18,12 +18,12 @@
     </div>
   </div>
 
-  <!-- ── FILTER BAR: tìm kiếm + combobox chỉ tiêu ─────────────────────── -->
   <mat-card class="filter-bar">
     <mat-card-content style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
       <mat-form-field appearance="outline" style="flex:1;min-width:200px" subscriptSizing="dynamic">
         <mat-label>Tìm kiếm đơn vị</mat-label>
-        <input matInput [(ngModel)]="search" (ngModelChange)="onSearchInput()" (keyup.enter)="onSearch()" placeholder="Nhập tên hoặc mã đơn vị…">
+        <input matInput [(ngModel)]="search" (ngModelChange)="onSearchInput()" (keyup.enter)="onSearch()"
+          placeholder="Nhập tên hoặc mã đơn vị…">
         <mat-icon matPrefix>search</mat-icon>
         <button *ngIf="search" matSuffix mat-icon-button (click)="clearSearch()">
           <mat-icon>close</mat-icon>
@@ -40,11 +40,8 @@
       </mat-form-field>
 
       <!-- Nút tổng hợp gộp -->
-      <button mat-raised-button color="accent"
-              *ngIf="selection.hasValue()"
-              (click)="viewCombinedSummary()"
-              [disabled]="loadingCombined"
-              style="height:56px;font-weight:600">
+      <button mat-raised-button color="accent" *ngIf="selection.hasValue()" (click)="viewCombinedSummary()"
+        [disabled]="loadingCombined" style="height:56px;font-weight:600">
         <mat-spinner *ngIf="loadingCombined" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
         <mat-icon *ngIf="!loadingCombined">analytics</mat-icon>
         {{ loadingCombined ? 'Đang tổng hợp…' : 'Tổng hợp gộp (' + selection.selected.length + ' đơn vị)' }}
@@ -52,12 +49,9 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- PANEL: TỔNG HỢP GỘP NGAY TRÊN TRANG                              -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <mat-card class="combined-panel" *ngIf="showCombinedPanel" style="margin-bottom:16px;border:2px solid #1976d2;border-radius:12px">
+  <mat-card class="combined-panel" *ngIf="showCombinedPanel"
+    style="margin-bottom:16px;border:2px solid #1976d2;border-radius:12px">
     <mat-card-content>
-      <!-- Tiêu đề panel -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div>
           <h3 style="margin:0;color:#1976d2;display:flex;align-items:center;gap:8px">
@@ -65,7 +59,8 @@
             Tổng hợp gộp – {{ combinedUnitNames.length }} đơn vị đã chọn
           </h3>
           <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-            <mat-chip *ngFor="let name of combinedUnitNames" color="primary" [highlighted]="true" style="font-size:12px">
+            <mat-chip *ngFor="let name of combinedUnitNames" color="primary" [highlighted]="true"
+              style="font-size:12px">
               <mat-icon matChipAvatar>business</mat-icon>{{ name }}
             </mat-chip>
           </div>
@@ -75,48 +70,46 @@
         </button>
       </div>
 
-      <!-- Loading -->
       <div *ngIf="loadingCombined" style="text-align:center;padding:32px">
-        <mat-spinner diameter="48"></mat-spinner><p>Đang tổng hợp dữ liệu…</p>
+        <mat-spinner diameter="48"></mat-spinner>
+        <p>Đang tổng hợp dữ liệu…</p>
       </div>
 
-      <!-- Nội dung tổng hợp -->
       <div *ngIf="combinedData && !loadingCombined">
-        <!-- Thẻ tổng quan – luôn hiện -->
         <div class="summary-grid" style="margin-bottom:20px">
           <div class="summary-card blue">
-            <div class="sv">{{ combinedData.totalMembers }}</div><div class="sl">Tổng đoàn viên</div>
+            <div class="sv">{{ combinedData.totalMembers }}</div>
+            <div class="sl">Tổng đoàn viên</div>
           </div>
           <div class="summary-card green" *ngIf="showSection('gender') || showSection('all')">
-            <div class="sv">{{ combinedData.maleCount }}</div><div class="sl">Nam</div>
+            <div class="sv">{{ combinedData.maleCount }}</div>
+            <div class="sl">Nam</div>
           </div>
           <div class="summary-card pink" *ngIf="showSection('gender') || showSection('all')">
-            <div class="sv">{{ combinedData.femaleCount }}</div><div class="sl">Nữ</div>
+            <div class="sv">{{ combinedData.femaleCount }}</div>
+            <div class="sl">Nữ</div>
           </div>
           <div class="summary-card orange" *ngIf="showSection('party') || showSection('all')">
-            <div class="sv">{{ combinedData.partyOfficialCount }}</div><div class="sl">Đảng viên CT</div>
+            <div class="sv">{{ combinedData.partyOfficialCount }}</div>
+            <div class="sl">Đảng viên CT</div>
           </div>
           <div class="summary-card teal" *ngIf="showSection('ethnicity') || showSection('all')">
-            <div class="sv">{{ combinedData.ethnicityKinh }}</div><div class="sl">Dân tộc Kinh</div>
+            <div class="sv">{{ combinedData.ethnicityKinh }}</div>
+            <div class="sl">Dân tộc Kinh</div>
           </div>
         </div>
-
-        <!-- Chi tiết theo chỉ tiêu đã chọn -->
         <div class="info-row-grid">
-          <!-- Độ tuổi -->
           <div class="info-section" *ngIf="showSection('age')">
             <h4><mat-icon style="font-size:16px;vertical-align:middle">cake</mat-icon> Độ tuổi</h4>
             <div class="kv"><span>18–25</span><strong>{{ combinedData.age18To25 }}</strong></div>
             <div class="kv"><span>26–30</span><strong>{{ combinedData.age26To30 }}</strong></div>
             <div class="kv"><span>31+</span><strong>{{ combinedData.age31Plus }}</strong></div>
           </div>
-          <!-- Dân tộc -->
           <div class="info-section" *ngIf="showSection('ethnicity')">
             <h4><mat-icon style="font-size:16px;vertical-align:middle">people</mat-icon> Dân tộc</h4>
             <div class="kv"><span>Kinh</span><strong>{{ combinedData.ethnicityKinh }}</strong></div>
             <div class="kv"><span>Khác</span><strong>{{ combinedData.ethnicityOther }}</strong></div>
           </div>
-          <!-- Đảng viên -->
           <div class="info-section" *ngIf="showSection('party')">
             <h4><mat-icon style="font-size:16px;vertical-align:middle">star</mat-icon> Đảng viên</h4>
             <div class="kv"><span>Dự bị</span><strong>{{ combinedData.partyProbationaryCount }}</strong></div>
@@ -186,12 +179,10 @@
             <th mat-header-cell *matHeaderCellDef style="width:48px">
               <mat-checkbox (change)="$event ? masterToggle() : null"
                 [checked]="selection.hasValue() && isAllSelected()"
-                [indeterminate]="selection.hasValue() && !isAllSelected()"
-                matTooltip="Chọn tất cả"></mat-checkbox>
+                [indeterminate]="selection.hasValue() && !isAllSelected()" matTooltip="Chọn tất cả"></mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let u">
-              <mat-checkbox (click)="$event.stopPropagation()"
-                (change)="onRowToggle(u)"
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="onRowToggle(u)"
                 [checked]="selection.isSelected(u)"></mat-checkbox>
             </td>
           </ng-container>
@@ -227,13 +218,15 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef style="text-align:right">Thao tác</th>
             <td mat-cell *matCellDef="let u" style="text-align:right;white-space:nowrap">
-              <button mat-icon-button color="accent" (click)="openSummary(u)" [disabled]="!u.hasSummary" matTooltip="Xem tổng hợp chi tiết">
+              <button mat-icon-button color="accent" (click)="openSummary(u)" [disabled]="!u.hasSummary"
+                matTooltip="Xem tổng hợp chi tiết">
                 <mat-icon>bar_chart</mat-icon>
               </button>
               <button mat-icon-button (click)="openImport(u)" matTooltip="Import Excel">
                 <mat-icon>upload_file</mat-icon>
               </button>
-              <button mat-icon-button color="primary" (click)="exportUnit(u)" [disabled]="!u.hasSummary" matTooltip="Xuất Excel">
+              <button mat-icon-button color="primary" (click)="exportUnit(u)" [disabled]="!u.hasSummary"
+                matTooltip="Xuất Excel">
                 <mat-icon>download</mat-icon>
               </button>
               <button mat-icon-button (click)="openEdit(u)" matTooltip="Sửa">
@@ -249,13 +242,14 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell empty-cell" colspan="5">
-              <mat-icon>business_center</mat-icon><p>Chưa có đơn vị nào.</p>
+              <mat-icon>business_center</mat-icon>
+              <p>Chưa có đơn vị nào.</p>
             </td>
           </tr>
         </table>
       </div>
-      <mat-paginator [length]="total" [pageSize]="pageSize" [pageSizeOptions]="[10,15,30,50]"
-        [pageIndex]="page-1" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+      <mat-paginator [length]="total" [pageSize]="pageSize" [pageSizeOptions]="[10,15,30,50]" [pageIndex]="page-1"
+        (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>
@@ -330,7 +324,8 @@
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Hủy</button>
     <button mat-raised-button color="primary" (click)="saveUnit()" [disabled]="saving || inlineUploading">
-      <mat-spinner *ngIf="saving || inlineUploading" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+      <mat-spinner *ngIf="saving || inlineUploading" diameter="18"
+        style="display:inline-block;margin-right:6px"></mat-spinner>
       {{ saving || inlineUploading ? 'Đang xử lý…' : (editMode ? 'Cập nhật' : 'Lưu') }}
     </button>
   </mat-dialog-actions>
@@ -357,14 +352,16 @@
       <mat-label>Tên Sheet</mat-label>
       <input matInput [(ngModel)]="sheetName" placeholder="Sheet1">
     </mat-form-field>
-    <div *ngIf="importResult" class="import-result" [class.success]="importResult.success" [class.error]="!importResult.success">
+    <div *ngIf="importResult" class="import-result" [class.success]="importResult.success"
+      [class.error]="!importResult.success">
       <mat-icon>{{ importResult.success ? 'check_circle' : 'error' }}</mat-icon>
       {{ importResult.message }}
     </div>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Đóng</button>
-    <button mat-raised-button color="primary" (click)="doImportMultiple()" [disabled]="!selectedFileIds.length || importing">
+    <button mat-raised-button color="primary" (click)="doImportMultiple()"
+      [disabled]="!selectedFileIds.length || importing">
       <mat-spinner *ngIf="importing" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
       {{ importing ? 'Đang tổng hợp…' : 'Tổng hợp ' + selectedFileIds.length + ' file' }}
     </button>
@@ -380,11 +377,13 @@
   <mat-dialog-content>
     <div *ngIf="loadingSummary" style="text-align:center;padding:32px"><mat-spinner diameter="48"></mat-spinner></div>
     <div *ngIf="!loadingSummary && !summaryData" style="text-align:center;padding:24px;color:#999">
-      <mat-icon style="font-size:40px">info</mat-icon><p>Chưa có dữ liệu. Hãy import Excel trước.</p>
+      <mat-icon style="font-size:40px">info</mat-icon>
+      <p>Chưa có dữ liệu. Hãy import Excel trước.</p>
     </div>
     <div *ngIf="summaryData">
       <!-- Combobox lọc trong dialog -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px;background:#f0f4ff;border-radius:8px">
+      <div
+        style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px;background:#f0f4ff;border-radius:8px">
         <mat-icon style="color:#1976d2">filter_list</mat-icon>
         <mat-form-field appearance="outline" style="flex:1;margin-bottom:-16px">
           <mat-label>Xem theo chỉ tiêu</mat-label>
@@ -395,22 +394,75 @@
       </div>
       <!-- Tổng quan -->
       <div class="summary-grid">
-        <div class="summary-card blue"><div class="sv">{{ summaryData.totalMembers }}</div><div class="sl">Tổng đoàn viên</div></div>
-        <div class="summary-card green" *ngIf="showSectionDlg('gender')||showSectionDlg('all')"><div class="sv">{{ summaryData.maleCount }}</div><div class="sl">Nam</div></div>
-        <div class="summary-card pink"  *ngIf="showSectionDlg('gender')||showSectionDlg('all')"><div class="sv">{{ summaryData.femaleCount }}</div><div class="sl">Nữ</div></div>
-        <div class="summary-card orange" *ngIf="showSectionDlg('party')||showSectionDlg('all')"><div class="sv">{{ summaryData.partyOfficialCount }}</div><div class="sl">Đảng viên CT</div></div>
+        <div class="summary-card blue">
+          <div class="sv">{{ summaryData.totalMembers }}</div>
+          <div class="sl">Tổng đoàn viên</div>
+        </div>
+        <div class="summary-card green" *ngIf="showSectionDlg('gender')||showSectionDlg('all')">
+          <div class="sv">{{ summaryData.maleCount }}</div>
+          <div class="sl">Nam</div>
+        </div>
+        <div class="summary-card pink" *ngIf="showSectionDlg('gender')||showSectionDlg('all')">
+          <div class="sv">{{ summaryData.femaleCount }}</div>
+          <div class="sl">Nữ</div>
+        </div>
+        <div class="summary-card orange" *ngIf="showSectionDlg('party')||showSectionDlg('all')">
+          <div class="sv">{{ summaryData.partyOfficialCount }}</div>
+          <div class="sl">Đảng viên CT</div>
+        </div>
       </div>
       <div class="info-row-grid" style="margin-top:20px">
-        <div class="info-section" *ngIf="showSectionDlg('ethnicity')"><h4><mat-icon style="font-size:16px;vertical-align:middle">people</mat-icon> Dân tộc</h4><div class="kv"><span>Kinh</span><strong>{{ summaryData.ethnicityKinh }}</strong></div><div class="kv"><span>Khác</span><strong>{{ summaryData.ethnicityOther }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('party')"><h4><mat-icon style="font-size:16px;vertical-align:middle">star</mat-icon> Đảng viên</h4><div class="kv"><span>Dự bị</span><strong>{{ summaryData.partyProbationaryCount }}</strong></div><div class="kv"><span>Chính thức</span><strong>{{ summaryData.partyOfficialCount }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('age')"><h4><mat-icon style="font-size:16px;vertical-align:middle">cake</mat-icon> Độ tuổi</h4><div class="kv"><span>18–25</span><strong>{{ summaryData.age18To25 }}</strong></div><div class="kv"><span>26–30</span><strong>{{ summaryData.age26To30 }}</strong></div><div class="kv"><span>31+</span><strong>{{ summaryData.age31Plus }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('communist')"><h4><mat-icon style="font-size:16px;vertical-align:middle">account_balance</mat-icon> Cấp ủy</h4><div class="kv"><span>Cấp trên CS</span><strong>{{ summaryData.communistAboveBase }}</strong></div><div class="kv"><span>Cơ sở</span><strong>{{ summaryData.communistBase }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('profession') && summaryData.professions"><h4><mat-icon style="font-size:16px;vertical-align:middle">work</mat-icon> Nghề nghiệp</h4><div class="kv" *ngFor="let k of dictKeys(summaryData.professions)"><span>{{ k }}</span><strong>{{ summaryData.professions[k] }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('education') && summaryData.educations"><h4><mat-icon style="font-size:16px;vertical-align:middle">school</mat-icon> Học vấn</h4><div class="kv" *ngFor="let k of dictKeys(summaryData.educations)"><span>{{ k }}</span><strong>{{ summaryData.educations[k] }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('expertise') && summaryData.expertises"><h4><mat-icon style="font-size:16px;vertical-align:middle">history_edu</mat-icon> Chuyên môn</h4><div class="kv" *ngFor="let k of dictKeys(summaryData.expertises)"><span>{{ k }}</span><strong>{{ summaryData.expertises[k] }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('political') && summaryData.politicalTheories"><h4><mat-icon style="font-size:16px;vertical-align:middle">gavel</mat-icon> Lý luận chính trị</h4><div class="kv" *ngFor="let k of dictKeys(summaryData.politicalTheories)"><span>{{ k }}</span><strong>{{ summaryData.politicalTheories[k] }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('religion') && summaryData.religions"><h4><mat-icon style="font-size:16px;vertical-align:middle">church</mat-icon> Tôn giáo</h4><div class="kv" *ngFor="let k of dictKeys(summaryData.religions)"><span>{{ k }}</span><strong>{{ summaryData.religions[k] }}</strong></div></div>
-        <div class="info-section" *ngIf="showSectionDlg('position') && summaryData.positionRoles"><h4><mat-icon style="font-size:16px;vertical-align:middle">badge</mat-icon> Chức vụ chủ chốt</h4><div class="kv" *ngFor="let k of dictKeys(summaryData.positionRoles)"><span>{{ k }}</span><strong>{{ summaryData.positionRoles[k] }}</strong></div></div>
+        <div class="info-section" *ngIf="showSectionDlg('ethnicity')">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">people</mat-icon> Dân tộc</h4>
+          <div class="kv"><span>Kinh</span><strong>{{ summaryData.ethnicityKinh }}</strong></div>
+          <div class="kv"><span>Khác</span><strong>{{ summaryData.ethnicityOther }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('party')">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">star</mat-icon> Đảng viên</h4>
+          <div class="kv"><span>Dự bị</span><strong>{{ summaryData.partyProbationaryCount }}</strong></div>
+          <div class="kv"><span>Chính thức</span><strong>{{ summaryData.partyOfficialCount }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('age')">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">cake</mat-icon> Độ tuổi</h4>
+          <div class="kv"><span>18–25</span><strong>{{ summaryData.age18To25 }}</strong></div>
+          <div class="kv"><span>26–30</span><strong>{{ summaryData.age26To30 }}</strong></div>
+          <div class="kv"><span>31+</span><strong>{{ summaryData.age31Plus }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('communist')">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">account_balance</mat-icon> Cấp ủy</h4>
+          <div class="kv"><span>Cấp trên CS</span><strong>{{ summaryData.communistAboveBase }}</strong></div>
+          <div class="kv"><span>Cơ sở</span><strong>{{ summaryData.communistBase }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('profession') && summaryData.professions">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">work</mat-icon> Nghề nghiệp</h4>
+          <div class="kv" *ngFor="let k of dictKeys(summaryData.professions)"><span>{{ k }}</span><strong>{{
+              summaryData.professions[k] }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('education') && summaryData.educations">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">school</mat-icon> Học vấn</h4>
+          <div class="kv" *ngFor="let k of dictKeys(summaryData.educations)"><span>{{ k }}</span><strong>{{
+              summaryData.educations[k] }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('expertise') && summaryData.expertises">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">history_edu</mat-icon> Chuyên môn</h4>
+          <div class="kv" *ngFor="let k of dictKeys(summaryData.expertises)"><span>{{ k }}</span><strong>{{
+              summaryData.expertises[k] }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('political') && summaryData.politicalTheories">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">gavel</mat-icon> Lý luận chính trị</h4>
+          <div class="kv" *ngFor="let k of dictKeys(summaryData.politicalTheories)"><span>{{ k }}</span><strong>{{
+              summaryData.politicalTheories[k] }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('religion') && summaryData.religions">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">church</mat-icon> Tôn giáo</h4>
+          <div class="kv" *ngFor="let k of dictKeys(summaryData.religions)"><span>{{ k }}</span><strong>{{
+              summaryData.religions[k] }}</strong></div>
+        </div>
+        <div class="info-section" *ngIf="showSectionDlg('position') && summaryData.positionRoles">
+          <h4><mat-icon style="font-size:16px;vertical-align:middle">badge</mat-icon> Chức vụ chủ chốt</h4>
+          <div class="kv" *ngFor="let k of dictKeys(summaryData.positionRoles)"><span>{{ k }}</span><strong>{{
+              summaryData.positionRoles[k] }}</strong></div>
+        </div>
       </div>
     </div>
   </mat-dialog-content>

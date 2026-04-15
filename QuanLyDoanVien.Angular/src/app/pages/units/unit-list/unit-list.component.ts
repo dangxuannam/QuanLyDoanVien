@@ -17,7 +17,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
   @ViewChild('summaryTpl') summaryTpl!: TemplateRef<any>;
   private dlgRef?: MatDialogRef<any>;
 
-  /* ── Danh sách đơn vị ───────────────────────────────────────────────── */
   units: any[] = [];
   total = 0;
   page = 1;
