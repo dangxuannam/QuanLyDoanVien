@@ -18,7 +18,6 @@
       <mat-icon>people</mat-icon> Cơ cấu Đoàn viên
     </button>
   </div>
-
   <div *ngIf="activeTab === 'unit'">
     <div *ngIf="loadingUnit" class="center-spinner">
       <mat-spinner diameter="48"></mat-spinner>
@@ -127,7 +126,6 @@
       </mat-card>
     </ng-container>
   </div>
-
   <div *ngIf="activeTab === 'demographics'">
     <mat-card class="filter-card">
       <div class="filter-row">
@@ -144,19 +142,15 @@
         </button>
       </div>
     </mat-card>
-
     <div *ngIf="loadingDemographics" class="center-spinner">
       <mat-spinner diameter="48"></mat-spinner>
     </div>
-
     <ng-container *ngIf="!loadingDemographics && demographics">
       <div class="demo-total-badge">
         <mat-icon>groups</mat-icon>
         Tổng đoàn viên trong báo cáo: <strong>{{ demographics.total }}</strong>
       </div>
-
       <div class="demo-grid">
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon gender-icon">wc</mat-icon>
@@ -176,7 +170,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon age-icon">cake</mat-icon>
@@ -195,7 +188,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon ethnic-icon">public</mat-icon>
@@ -214,7 +206,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon religion-icon">self_improvement</mat-icon>
@@ -233,7 +224,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon edu-icon">school</mat-icon>
@@ -252,7 +242,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon expertise-icon">workspace_premium</mat-icon>
@@ -271,7 +260,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon prof-icon">work</mat-icon>
@@ -290,7 +278,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
         <mat-card class="demo-card">
           <mat-card-header>
             <mat-icon mat-card-avatar class="demo-icon political-icon">military_tech</mat-icon>
@@ -311,6 +298,89 @@
         </mat-card>
 
       </div>
+
+
+      <div class="demo-grid">
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon party-icon">account_balance</mat-icon>
+            <mat-card-title>Tham gia cấp ủy</mat-card-title>
+            <mat-card-subtitle>Trong tổng số {{ demographics.total }} đoàn viên</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars">
+              <div class="demo-bar-row">
+                <span class="demo-lbl">Cấp trên cơ sở</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(demographics.upperPartyCommittee, demographics.total)"
+                    [style.background]="'#9b72cf'"></div>
+                </div>
+                <span class="demo-cnt">
+                  {{ demographics.upperPartyCommittee }}
+                  <small>({{ pct(demographics.upperPartyCommittee, demographics.total) }}%)</small>
+                </span>
+              </div>
+              <div class="demo-bar-row">
+                <span class="demo-lbl">Cấp ủy cơ sở</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(demographics.basePartyCommittee, demographics.total)"
+                    [style.background]="'#d9534f'"></div>
+                </div>
+                <span class="demo-cnt">
+                  {{ demographics.basePartyCommittee }}
+                  <small>({{ pct(demographics.basePartyCommittee, demographics.total) }}%)</small>
+                </span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon keypos-icon">stars</mat-icon>
+            <mat-card-title>Chức vụ chủ chốt</mat-card-title>
+            <mat-card-subtitle>Ban chấp hành / Ban thường vụ / Bí thư / Phó Bí thư</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars" *ngIf="demographics.byKeyPosition && demographics.byKeyPosition.length > 0; else noKeyPos">
+              <div *ngFor="let g of demographics.byKeyPosition; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                    [style.background]="getBarColor(i)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+            <ng-template #noKeyPos>
+              <p class="no-data-hint"><mat-icon>info_outline</mat-icon> Không có đoàn viên đảm nhiệm chức vụ này</p>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="demo-icon specialist-icon">manage_accounts</mat-icon>
+            <mat-card-title>Chuyên môn</mat-card-title>
+            <mat-card-subtitle>Đảm nhiệm chức vụ cấp trưởng / cấp phó</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-bars" *ngIf="demographics.bySpecialistPosition && demographics.bySpecialistPosition.length > 0; else noSpecPos">
+              <div *ngFor="let g of demographics.bySpecialistPosition; let i = index" class="demo-bar-row">
+                <span class="demo-lbl">{{ g.label }}</span>
+                <div class="demo-bar-track">
+                  <div class="demo-bar-fill" [style.width.%]="pct(g.count, demographics.total)"
+                    [style.background]="getBarColor(i + 2)"></div>
+                </div>
+                <span class="demo-cnt">{{ g.count }} <small>({{ pct(g.count, demographics.total) }}%)</small></span>
+              </div>
+            </div>
+            <ng-template #noSpecPos>
+              <p class="no-data-hint"><mat-icon>info_outline</mat-icon> Không có đoàn viên đảm nhiệm chức vụ này</p>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
     </ng-container>
   </div>
 </div>

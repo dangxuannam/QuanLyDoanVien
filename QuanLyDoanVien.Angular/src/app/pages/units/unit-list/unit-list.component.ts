@@ -12,84 +12,77 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
   templateUrl: './unit-list.component.html'
 })
 export class UnitListComponent implements OnInit, OnDestroy {
-  @ViewChild('formTpl')    formTpl!:    TemplateRef<any>;
-  @ViewChild('importTpl')  importTpl!:  TemplateRef<any>;
+  @ViewChild('formTpl') formTpl!: TemplateRef<any>;
+  @ViewChild('importTpl') importTpl!: TemplateRef<any>;
   @ViewChild('summaryTpl') summaryTpl!: TemplateRef<any>;
   private dlgRef?: MatDialogRef<any>;
 
   /* ── Danh sách đơn vị ───────────────────────────────────────────────── */
-  units: any[]  = [];
-  total         = 0;
-  page          = 1;
-  pageSize      = 15;
-  search        = '';
-  loading       = false;
+  units: any[] = [];
+  total = 0;
+  page = 1;
+  pageSize = 15;
+  search = '';
+  loading = false;
   displayedColumns = ['select', 'unitName', 'totalMembers', 'lastImportAt', 'actions'];
 
-  /* ── RxJS: debounce search ──────────────────────────────────────────── */
   private searchSubject = new Subject<string>();
-  private destroy$      = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
-  /* ── Checkbox chọn hàng loạt ─────────────────────────────────────────── */
   selection = new SelectionModel<any>(true, []);
 
-  /* ── Form tạo / sửa ─────────────────────────────────────────────────── */
-  editMode       = false;
+  editMode = false;
   editingId: number | null = null;
-  formData       = { unitName: '', description: '' };
-  saving         = false;
-  createTab      = 'manual';
+  formData = { unitName: '', description: '' };
+  saving = false;
+  createTab = 'manual';
   createTabIndex = 0;
   inlineFile: File | null = null;
   inlineUploading = false;
   existingFileId: number | null = null;
 
-  /* ── Upload / Import ─────────────────────────────────────────────────── */
-  files: any[]     = [];
-  filesLoaded      = false;
+  files: any[] = [];
+  filesLoaded = false;
   importingUnit: any = null;
   selectedFileIds: number[] = [];
-  sheetName      = 'Sheet1';
-  importing      = false;
+  sheetName = 'Sheet1';
+  importing = false;
   importResult: any = null;
 
-  /* ── Xem tổng hợp đơn lẻ (qua dialog) ──────────────────────────────── */
-  summaryUnit: any  = null;
-  summaryData: any  = null;
-  loadingSummary    = false;
-  selectedMetricDlg = 'all';   // combobox trong dialog
+  summaryUnit: any = null;
+  summaryData: any = null;
+  loadingSummary = false;
+  selectedMetricDlg = 'all';
 
-  /* ── TỔNG HỢP GỘP NGAY TRÊN TRANG ─────────────────────────────────── */
-  combinedData: any       = null;
+  combinedData: any = null;
   combinedUnitNames: string[] = [];
-  loadingCombined         = false;
-  showCombinedPanel       = false;
-  selectedMetric          = 'all';   // combobox trên trang chính
+  loadingCombined = false;
+  showCombinedPanel = false;
+  selectedMetric = 'all';
 
-  /* ── Danh sách chỉ tiêu ─────────────────────────────────────────────── */
+
   readonly METRICS = [
-    { value: 'all',        label: '— Tất cả chỉ tiêu —' },
-    { value: 'gender',     label: '👤 Giới tính' },
-    { value: 'age',        label: '🎂 Độ tuổi' },
-    { value: 'ethnicity',  label: '🌏 Dân tộc' },
-    { value: 'religion',   label: '⛪ Tôn giáo' },
+    { value: 'all', label: '— Tất cả chỉ tiêu —' },
+    { value: 'gender', label: '👤 Giới tính' },
+    { value: 'age', label: '🎂 Độ tuổi' },
+    { value: 'ethnicity', label: '🌏 Dân tộc' },
+    { value: 'religion', label: '⛪ Tôn giáo' },
     { value: 'profession', label: '💼 Nghề nghiệp' },
-    { value: 'education',  label: '📚 Học vấn' },
-    { value: 'expertise',  label: '🎓 Chuyên môn' },
-    { value: 'political',  label: '⚖️ Lý luận chính trị' },
-    { value: 'party',      label: '⭐ Đảng viên' },
-    { value: 'communist',  label: '🏛️ Cấp ủy' },
-    { value: 'position',   label: '🎖️ Chức vụ chủ chốt' },
+    { value: 'education', label: '📚 Học vấn' },
+    { value: 'expertise', label: '🎓 Chuyên môn' },
+    { value: 'political', label: '⚖️ Lý luận chính trị' },
+    { value: 'party', label: '⭐ Đảng viên' },
+    { value: 'communist', label: '🏛️ Cấp ủy' },
+    { value: 'position', label: '🎖️ Chức vụ chủ chốt' },
   ];
 
   constructor(
-    private api:    ApiService,
+    private api: ApiService,
     private dialog: MatDialog,
-    private snack:  MatSnackBar
-  ) {}
+    private snack: MatSnackBar
+  ) { }
 
   ngOnInit() {
-    // Debounce tìm kiếm tự động sau 400ms ngừng gõ
     this.searchSubject.pipe(
       debounceTime(400),
       distinctUntilChanged(),
@@ -101,7 +94,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
 
-  /* ──────────────────── DANH SÁCH ─────────────────────────────────────── */
   load() {
     this.loading = true;
     this.selection.clear();
@@ -114,13 +106,12 @@ export class UnitListComponent implements OnInit, OnDestroy {
   }
 
   onSearchInput() { this.searchSubject.next(this.search); }
-  clearSearch()   { this.search = ''; this.page = 1; this.load(); }
-  onSearch()      { this.page = 1; this.load(); }
+  clearSearch() { this.search = ''; this.page = 1; this.load(); }
+  onSearch() { this.page = 1; this.load(); }
   onPageChange(e: PageEvent) { this.page = e.pageIndex + 1; this.pageSize = e.pageSize; this.load(); }
 
-  /* ──── checkbox ──────────────────────────────────────────────────────── */
   isAllSelected() { return this.units.length > 0 && this.selection.selected.length === this.units.length; }
-  masterToggle()  {
+  masterToggle() {
     if (this.isAllSelected()) { this.selection.clear(); }
     else { this.units.forEach(u => this.selection.select(u)); }
     this.closeCombinedPanel();
@@ -130,7 +121,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
     this.closeCombinedPanel();
   }
 
-  /* ──── TỔng hợp gộp ngay trên trang ─────────────────────────────────── */
   viewCombinedSummary() {
     const selected = this.selection.selected;
     if (!selected.length) return;
@@ -167,7 +157,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
     return this.selectedMetric === 'all' || this.selectedMetric === key;
   }
 
-  /* ──────────────────── THÊM / SỬA ───────────────────────────────────── */
   openCreate() {
     this.editMode = false; this.editingId = null;
     this.formData = { unitName: '', description: '' };
@@ -234,7 +223,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
     }
   }
 
-  /* ──────────────────── XÓA ──────────────────────────────────────────── */
   deleteUnit(u: any) {
     if (!confirm(`Xóa đơn vị "${u.unitName}"?`)) return;
     this.api.deleteUnit(u.id).subscribe({ next: () => { this.snack.open('Đã xóa.', 'Đóng', { duration: 3000 }); this.load(); } });
@@ -247,7 +235,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* ──────────────────── IMPORT ────────────────────────────────────────── */
   loadFiles() {
     this.api.getFiles({ page: 1, pageSize: 200 }).subscribe({ next: r => { this.files = r.items; this.filesLoaded = true; } });
   }
@@ -266,7 +253,6 @@ export class UnitListComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* ──────────────────── XEM TỔNG HỢP (DIALOG ĐƠN LẺ) ────────────────── */
   openSummary(u: any) {
     this.summaryUnit = u; this.summaryData = null; this.loadingSummary = true; this.selectedMetricDlg = 'all';
     this.dlgRef = this.dialog.open(this.summaryTpl, { width: '900px', maxHeight: '90vh', panelClass: 'unit-mat-dialog' });
@@ -277,12 +263,10 @@ export class UnitListComponent implements OnInit, OnDestroy {
   }
   showSectionDlg(key: string) { return this.selectedMetricDlg === 'all' || this.selectedMetricDlg === key; }
 
-  /* ──────────────────── XUẤT EXCEL ───────────────────────────────────── */
   exportUnit(u: any) { window.location.href = this.api.exportUnitUrl(u.id); }
-  exportAll()        { window.location.href = this.api.exportAllUnitsUrl(); }
+  exportAll() { window.location.href = this.api.exportAllUnitsUrl(); }
 
-  /* ── Helpers ─────────────────────────────────────────────────────────── */
-  dictKeys(d: any)  { return d ? Object.keys(d) : []; }
+  dictKeys(d: any) { return d ? Object.keys(d) : []; }
   getFileName(id: number) { return this.files.find(f => f.id === id)?.originalName ?? `File #${id}`; }
-  closeDlg()        { this.dlgRef?.close(); }
+  closeDlg() { this.dlgRef?.close(); }
 }

@@ -85,7 +85,6 @@ namespace QuanLyDoanVien.Api
                     return Ok(BuildDemographicsFromMembers(members));
                 }
 
-                // Tất cả đơn vị: query live từ tất cả Members đang hoạt động
                 var allMembers = db.Members.Where(m => m.IsActive).ToList();
                 return Ok(BuildDemographicsFromMembers(allMembers));
             }
@@ -112,11 +111,33 @@ namespace QuanLyDoanVien.Api
             if (s.EthnicityKinh  > 0) byEthnicity.Add(new { label = "Kinh",  count = s.EthnicityKinh  });
             if (s.EthnicityOther > 0) byEthnicity.Add(new { label = "Khác",  count = s.EthnicityOther });
 
-            var byReligion       = DictToList(s.Religions);
-            var byProfession     = DictToList(s.Professions);
-            var byEducation      = DictToList(s.Educations);
-            var byExpertise      = DictToList(s.Expertises);
+            var byReligion        = DictToList(s.Religions);
+            var byProfession      = DictToList(s.Professions);
+            var byEducation       = DictToList(s.Educations);
+            var byExpertise       = DictToList(s.Expertises);
             var byPoliticalTheory = DictToList(s.PoliticalTheories);
+
+            // ── Cấp ủy & chức vụ chủ chốt ──────────────────────────────────
+            int upperPartyCommittee = s.CommunistAboveBase;
+            int basePartyCommittee  = s.CommunistBase;
+
+            var byKeyPosition = new List<object>();
+            int bch      = s.PositionRoles != null && s.PositionRoles.ContainsKey("Ban chấp hành") ? s.PositionRoles["Ban chấp hành"] : 0;
+            int btv      = s.PositionRoles != null && s.PositionRoles.ContainsKey("Ban thường vụ") ? s.PositionRoles["Ban thường vụ"] : 0;
+            int biThu    = s.PositionRoles != null && s.PositionRoles.ContainsKey("Bí thư")        ? s.PositionRoles["Bí thư"] : 0;
+            int phoBiThu = s.PositionRoles != null && s.PositionRoles.ContainsKey("Phó Bí thư")    ? s.PositionRoles["Phó Bí thư"] : 0;
+
+            if (bch      > 0) byKeyPosition.Add(new { label = "Ban chấp hành",  count = bch      });
+            if (btv      > 0) byKeyPosition.Add(new { label = "Ban thường vụ",  count = btv      });
+            if (biThu    > 0) byKeyPosition.Add(new { label = "Bí thư",         count = biThu    });
+            if (phoBiThu > 0) byKeyPosition.Add(new { label = "Phó Bí thư",     count = phoBiThu });
+
+            var bySpecialistPosition = new List<object>();
+            int capTruong = s.PositionRoles != null && s.PositionRoles.ContainsKey("Cấp trưởng") ? s.PositionRoles["Cấp trưởng"] : 0;
+            int capPho    = s.PositionRoles != null && s.PositionRoles.ContainsKey("Cấp phó")    ? s.PositionRoles["Cấp phó"] : 0;
+
+            if (capTruong > 0) bySpecialistPosition.Add(new { label = "Cấp trưởng", count = capTruong });
+            if (capPho    > 0) bySpecialistPosition.Add(new { label = "Cấp phó",    count = capPho    });
 
             return new
             {
@@ -128,7 +149,11 @@ namespace QuanLyDoanVien.Api
                 byEducation,
                 byExpertise,
                 byProfession,
-                byPoliticalTheory
+                byPoliticalTheory,
+                upperPartyCommittee,
+                basePartyCommittee,
+                byKeyPosition,
+                bySpecialistPosition
             };
         }
 
@@ -206,6 +231,28 @@ namespace QuanLyDoanVien.Api
                 .OrderByDescending(g => ((dynamic)g).count)
                 .ToList();
 
+            // ── Cấp ủy ──────────────────────────────────────────────────────
+            int upperPartyCommittee = 0; // Not available in Member directly anymore
+            int basePartyCommittee  = 0;
+
+            // ── Chức vụ chủ chốt (BCH/BTV/Bí thư/Phó Bí thư) ───────────────
+            var byKeyPosition = new List<object>();
+            int bch      = members.Count(m => (m.Position ?? "").ToLower().Contains("ban chấp hành"));
+            int btv      = members.Count(m => (m.Position ?? "").ToLower().Contains("ban thường vụ"));
+            int phoBiThu = members.Count(m => (m.Position ?? "").ToLower().Contains("phó bí thư"));
+            int biThu    = members.Count(m => (m.Position ?? "").ToLower().Contains("bí thư") && !(m.Position ?? "").ToLower().Contains("phó bí thư"));
+            if (bch      > 0) byKeyPosition.Add(new { label = "Ban chấp hành", count = bch      });
+            if (btv      > 0) byKeyPosition.Add(new { label = "Ban thường vụ", count = btv      });
+            if (biThu    > 0) byKeyPosition.Add(new { label = "Bí thư",         count = biThu    });
+            if (phoBiThu > 0) byKeyPosition.Add(new { label = "Phó Bí thư",    count = phoBiThu });
+
+            // ── Chuyên môn cấp trưởng / cấp phó ────────────────────────────
+            var bySpecialistPosition = new List<object>();
+            int capTruong = members.Count(m => (m.Position ?? "").ToLower().Contains("trưởng"));
+            int capPho    = members.Count(m => (m.Position ?? "").ToLower().Contains("phó") && !(m.Position ?? "").ToLower().Contains("phó bí thư"));
+            if (capTruong > 0) bySpecialistPosition.Add(new { label = "Cấp trưởng", count = capTruong });
+            if (capPho    > 0) bySpecialistPosition.Add(new { label = "Cấp phó",    count = capPho    });
+
             return new
             {
                 total,
@@ -216,11 +263,14 @@ namespace QuanLyDoanVien.Api
                 byEducation,
                 byExpertise,
                 byProfession,
-                byPoliticalTheory
+                byPoliticalTheory,
+                upperPartyCommittee,
+                basePartyCommittee,
+                byKeyPosition,
+                bySpecialistPosition
             };
         }
 
-        
         private string Capitalize(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return s;

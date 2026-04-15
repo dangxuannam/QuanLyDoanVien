@@ -364,6 +364,34 @@
   height: 20px;
 }
 
+/* ── Section divider (mới) ────────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 32px 0 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a2340;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #e3e8f0, #c9d4ea);
+  border-radius: 2px;
+}
+
+.section-divider mat-icon {
+  color: #4f8ef7;
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+/* ── Demo grid ────────────────────────────────────────────── */
 .demo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
@@ -402,6 +430,7 @@
   color: #fff !important;
 }
 
+/* Icon màu sắc — các nhóm cũ */
 .gender-icon {
   background: linear-gradient(135deg, #4f8ef7, #1b5ed4);
 }
@@ -435,6 +464,20 @@
   background: linear-gradient(135deg, #d9534f, #9b2226);
 }
 
+/* Icon màu sắc — nhóm MỚI (cấp ủy & chức vụ) */
+.party-icon {
+  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+}
+
+.keypos-icon {
+  background: linear-gradient(135deg, #dc2626, #7f1d1d);
+}
+
+.specialist-icon {
+  background: linear-gradient(135deg, #0891b2, #164e63);
+}
+
+/* ── Demo bars ────────────────────────────────────────────── */
 .demo-bars {
   display: flex;
   flex-direction: column;
@@ -484,12 +527,32 @@
   color: #6b7888;
 }
 
+/* ── No data hint (mới) ───────────────────────────────────── */
+.no-data-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #6b7888;
+  margin: 8px 0 0;
+  font-style: italic;
+}
+
+.no-data-hint mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #b0b8cc;
+}
+
+/* ── Loading spinner ──────────────────────────────────────── */
 .center-spinner {
   display: flex;
   justify-content: center;
   padding: 60px 0;
 }
 
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 768px) {
   .reports-page {
     padding: 14px;

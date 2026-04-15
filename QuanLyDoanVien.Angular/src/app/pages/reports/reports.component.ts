@@ -34,6 +34,12 @@ interface DemographicsReport {
   byExpertise: ChartItem[];
   byProfession: ChartItem[];
   byPoliticalTheory: ChartItem[];
+  // ── Mới: Cấp ủy ──────────────────────────────────────────
+  upperPartyCommittee: number;
+  basePartyCommittee: number;
+  // ── Mới: Chức vụ chủ chốt & Chuyên môn ──────────────────
+  byKeyPosition: ChartItem[];
+  bySpecialistPosition: ChartItem[];
 }
 
 @Component({
@@ -52,7 +58,7 @@ export class ReportsComponent implements OnInit {
   selectedUnitId: number | null = null;
   units: { id: number; unitName: string }[] = [];
 
-  constructor(private api: ApiService, private snackBar: MatSnackBar) {}
+  constructor(private api: ApiService, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.loadUnitReport();
